@@ -1,0 +1,47 @@
+id: dex
+name: Dex (OIDC)
+version: "1.0"
+description: OIDC-Provider (Proxy zu moin.schule)
+category: infrastructure
+
+links:
+  homepage: https://dexidp.io
+  docs: https://dexidp.io/docs/
+
+image:
+  name: ghcr.io/dexidp/dex
+  tag: "v2.45.1"
+
+ports:
+  - host: 5556
+    container: 5556
+    description: OIDC-Endpunkt
+    bind: "0.0.0.0"
+
+volumes:
+  - host: /opt/learningstack/dex/data
+    container: /data
+  - host: /opt/learningstack/dex/config
+    container: /etc/dex
+    readonly: true
+
+# dex-config.yaml wird von stackctl komplett verwaltet (save_dex_config).
+# Der Inhalt hier ist leer — stackctl schreibt die Datei beim Setup und
+# bei jeder App-Installation/Entfernung neu.
+configs:
+  - path: /opt/learningstack/dex/config/dex-config.yaml
+    content: ""
+    mode: "0640"
+
+environment:
+  - key: DEX_ISSUER
+    value: "${DEX_AUTH_URL}"
+
+depends_on:
+  - postgres
+
+post_install:
+  messages:
+    - "Dex OIDC-Provider laeuft auf Port 5556"
+    - "Konfiguration wird von stackctl automatisch verwaltet"
+    - "OIDC-URL: {DEX_AUTH_URL}"

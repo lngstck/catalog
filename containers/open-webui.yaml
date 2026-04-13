@@ -1,0 +1,115 @@
+id: open-webui
+name: Open WebUI
+version: "1.0"
+description: Chat-Oberflaeche fuer LLMs
+category: education
+
+links:
+  homepage: https://openwebui.com
+  docs: https://docs.openwebui.com
+
+image:
+  name: ghcr.io/open-webui/open-webui
+  tag: main
+
+ports:
+  - host: 8310
+    container: 8080
+    description: Web UI
+
+volumes:
+  - host: /opt/learningstack/open-webui/data
+    container: /app/backend/data
+
+depends_on:
+  - postgres
+  - dex
+
+oidc:
+  client_id: open-webui
+  redirect_path: /oauth/oidc/callback
+
+environment:
+  # OIDC via Dex
+  - key: ENABLE_OAUTH_SIGNUP
+    value: "true"
+  - key: OAUTH_PROVIDER_NAME
+    value: Schullogin
+  - key: OAUTH_CLIENT_ID
+    value: open-webui
+  - key: OAUTH_CLIENT_SECRET
+    value: "${OPENWEBUI_OIDC_SECRET}"
+  - key: OPENID_PROVIDER_URL
+    value: "${DEX_AUTH_URL}"
+  - key: OAUTH_SCOPES
+    value: "openid profile groups"
+  # User-ID: immer sub (kein email bei moin.schule)
+  - key: OAUTH_USERNAME_CLAIM
+    value: sub
+  - key: OAUTH_EMAIL_CLAIM
+    value: sub
+  # Rollen-Mapping: Lehr + Leit = admin, Lern = user
+  - key: ENABLE_OAUTH_ROLE_MANAGEMENT
+    value: "true"
+  - key: OAUTH_ROLES_CLAIM
+    value: groups
+  - key: OAUTH_ALLOWED_ROLES
+    value: "Lehr,Leit,Lern"
+  - key: OAUTH_ADMIN_ROLES
+    value: "Lehr,Leit"
+  # PostgreSQL statt SQLite
+  - key: DATABASE_URL
+    value: "postgresql://learningstack:${POSTGRES_PASSWORD}@ls-postgres:5432/openwebui"
+  # LLM-Anbindung
+  - key: OPENAI_API_BASE_URL
+    value: "${LLM_ENDPOINT}"
+  - key: OPENAI_API_KEY
+    value: "${LLM_API_KEY}"
+  # Session-Secret
+  - key: WEBUI_SECRET_KEY
+    value: "${OPENWEBUI_SECRET_KEY}"
+  # UI
+  - key: WEBUI_NAME
+    value: "${SCHOOL_NAME} KI-Chat"
+  - key: DEFAULT_USER_ROLE
+    value: user
+  # Signup deaktivieren — alle User kommen ueber OIDC
+  - key: ENABLE_SIGNUP
+    value: "false"
+  - key: WEBUI_AUTH
+    value: "true"
+
+secrets:
+  - key: OPENWEBUI_OIDC_SECRET
+    generate: secret
+  - key: OPENWEBUI_SECRET_KEY
+    generate: secret
+
+global_env:
+  - key: LLM_ENDPOINT
+    description: OpenAI-kompatibler LLM-Endpunkt
+    required: false
+    default: https://llm.learningstack.online/v1
+  - key: LLM_API_KEY
+    description: API-Key fuer LLM-Proxy
+    required: false
+
+scripts:
+  post_install:
+    - type: docker-exec
+      container: ls-postgres
+      wait: healthy
+      command: |
+        psql -U learningstack -c "CREATE DATABASE openwebui OWNER learningstack;" || true
+
+post_install:
+  messages:
+    - "Open WebUI: http://{server_domain}:8310"
+    - "Login ueber Schullogin (OIDC via Dex)"
+    - "Lehrer (Lehr/Leit) erhalten Admin-Rechte"
+    - "OIDC funktioniert nur mit aktivem Tunnel"
+  secrets_to_show:
+    - key: OPENWEBUI_OIDC_SECRET
+      label: OIDC-Secret
+    - key: OPENWEBUI_SECRET_KEY
+      label: Session-Secret
