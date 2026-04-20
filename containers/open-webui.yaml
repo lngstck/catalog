@@ -42,12 +42,14 @@ environment:
   - key: OPENID_PROVIDER_URL
     value: "${DEX_AUTH_URL}"
   - key: OAUTH_SCOPES
-    value: "openid profile groups"
-  # User-ID: immer sub (kein email bei moin.schule)
+    value: "openid profile email groups"
+  # Anzeige-Name = Vorname (moin.schule liefert aktuell keinen Vollnamen).
+  # "email" ist der stabile App-Identifier — vom zentralen Dex gemapped
+  # auf moin.schules opaken sub (nicht echte E-Mail, aber stabil+eindeutig).
   - key: OAUTH_USERNAME_CLAIM
-    value: sub
+    value: name
   - key: OAUTH_EMAIL_CLAIM
-    value: sub
+    value: email
   # Rollen-Mapping: Lehr + Leit = admin, Lern = user
   - key: ENABLE_OAUTH_ROLE_MANAGEMENT
     value: "true"
