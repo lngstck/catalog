@@ -1,6 +1,6 @@
 id: postgres
 name: PostgreSQL
-version: "1.1"
+version: "1.2"
 description: Zentrale Datenbank fuer alle Apps
 category: infrastructure
 
@@ -19,8 +19,12 @@ ports:
     bind: "127.0.0.1"
 
 volumes:
+  # Direkt auf PGDATA mounten — die Postgres-Official-Image Entrypoint
+  # erwartet das Verzeichnis als Mount, nicht das Parent-Dir. Mount auf
+  # /var/lib/postgresql (Parent) fuehrt zu "cannot create directory"
+  # weil die Entrypoint dort keinen Unterordner anlegen kann.
   - host: /opt/learningstack/postgres/data
-    container: /var/lib/postgresql
+    container: /var/lib/postgresql/data
 
 # Bootstrap-Superuser heisst "postgres" — passend zu psql -U postgres, das
 # stackctl fuer SetupAppDB benutzt. Jede App bekommt einen eigenen User/DB
