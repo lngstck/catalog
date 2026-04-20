@@ -1,6 +1,6 @@
 id: postgres
 name: PostgreSQL
-version: "1.0"
+version: "1.1"
 description: Zentrale Datenbank fuer alle Apps
 category: infrastructure
 
@@ -22,13 +22,16 @@ volumes:
   - host: /opt/learningstack/postgres/data
     container: /var/lib/postgresql
 
+# Bootstrap-Superuser heisst "postgres" — passend zu psql -U postgres, das
+# stackctl fuer SetupAppDB benutzt. Jede App bekommt einen eigenen User/DB
+# (= sanitized App-ID) mit eigenem Passwort in {APP_ID}_DB_PASSWORD.
 environment:
   - key: POSTGRES_USER
-    value: learningstack
+    value: postgres
   - key: POSTGRES_PASSWORD
     value: "${POSTGRES_PASSWORD}"
   - key: POSTGRES_DB
-    value: learningstack
+    value: postgres
 
 secrets:
   - key: POSTGRES_PASSWORD
@@ -39,8 +42,8 @@ depends_on: []
 post_install:
   messages:
     - "PostgreSQL laeuft auf localhost:8100 (nur lokal)"
-    - "Benutzer: learningstack"
-    - "Andere Apps verbinden sich automatisch ueber Docker-Netzwerk"
+    - "Bootstrap-Benutzer: postgres"
+    - "Andere Apps erhalten eigene DB-User/Datenbanken beim Install"
   secrets_to_show:
     - key: POSTGRES_PASSWORD
-      label: PostgreSQL-Passwort
+      label: PostgreSQL-Bootstrap-Passwort

@@ -1,6 +1,6 @@
 id: open-webui
 name: Open WebUI
-version: "1.0"
+version: "1.1"
 description: Chat-Oberflaeche fuer LLMs
 category: education
 
@@ -38,7 +38,7 @@ environment:
   - key: OAUTH_CLIENT_ID
     value: open-webui
   - key: OAUTH_CLIENT_SECRET
-    value: "${OPENWEBUI_OIDC_SECRET}"
+    value: "${OPEN_WEBUI_OIDC_SECRET}"
   - key: OPENID_PROVIDER_URL
     value: "${DEX_AUTH_URL}"
   - key: OAUTH_SCOPES
@@ -57,9 +57,9 @@ environment:
     value: "Lehr,Leit,Lern"
   - key: OAUTH_ADMIN_ROLES
     value: "Lehr,Leit"
-  # PostgreSQL statt SQLite
+  # PostgreSQL statt SQLite — eigener User/DB pro App (stackctl legt sie an).
   - key: DATABASE_URL
-    value: "postgresql://learningstack:${POSTGRES_PASSWORD}@ls-postgres:5432/openwebui"
+    value: "postgresql://open_webui:${OPEN_WEBUI_DB_PASSWORD}@ls-postgres:5432/open_webui"
   # LLM-Anbindung
   - key: OPENAI_API_BASE_URL
     value: "${LLM_ENDPOINT}"
@@ -67,7 +67,7 @@ environment:
     value: "${LLM_API_KEY}"
   # Session-Secret
   - key: WEBUI_SECRET_KEY
-    value: "${OPENWEBUI_SECRET_KEY}"
+    value: "${OPEN_WEBUI_SECRET_KEY}"
   # UI
   - key: WEBUI_NAME
     value: "${SCHOOL_NAME} KI-Chat"
@@ -80,9 +80,9 @@ environment:
     value: "true"
 
 secrets:
-  - key: OPENWEBUI_OIDC_SECRET
+  - key: OPEN_WEBUI_OIDC_SECRET
     generate: secret
-  - key: OPENWEBUI_SECRET_KEY
+  - key: OPEN_WEBUI_SECRET_KEY
     generate: secret
 
 global_env:
@@ -94,14 +94,6 @@ global_env:
     description: API-Key fuer LLM-Proxy
     required: false
 
-scripts:
-  post_install:
-    - type: docker-exec
-      container: ls-postgres
-      wait: healthy
-      command: |
-        psql -U learningstack -c "CREATE DATABASE openwebui OWNER learningstack;" || true
-
 post_install:
   messages:
     - "Open WebUI: http://{server_domain}:8310"
@@ -109,7 +101,7 @@ post_install:
     - "Lehrer (Lehr/Leit) erhalten Admin-Rechte"
     - "OIDC funktioniert nur mit aktivem Tunnel"
   secrets_to_show:
-    - key: OPENWEBUI_OIDC_SECRET
+    - key: OPEN_WEBUI_OIDC_SECRET
       label: OIDC-Secret
-    - key: OPENWEBUI_SECRET_KEY
+    - key: OPEN_WEBUI_SECRET_KEY
       label: Session-Secret

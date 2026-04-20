@@ -1,6 +1,6 @@
 id: dex
 name: Dex (OIDC)
-version: "1.0"
+version: "1.1"
 description: OIDC-Provider (Proxy zu moin.schule)
 category: infrastructure
 
@@ -11,6 +11,13 @@ links:
 image:
   name: ghcr.io/dexidp/dex
   tag: "v2.45.1"
+
+# Dex nutzt SQLite unter /data/dex.db (Expiry-Werte sind in der von stackctl
+# generierten config.yaml gesetzt). Kein Postgres-Dependency.
+command:
+  - dex
+  - serve
+  - /etc/dex/config.yaml
 
 ports:
   - host: 5556
@@ -25,23 +32,15 @@ volumes:
     container: /etc/dex
     readonly: true
 
-# dex-config.yaml wird von stackctl komplett verwaltet (save_dex_config).
-# Der Inhalt hier ist leer — stackctl schreibt die Datei beim Setup und
-# bei jeder App-Installation/Entfernung neu.
-configs:
-  - path: /opt/learningstack/dex/config/dex-config.yaml
-    content: ""
-    mode: "0640"
+# dex-config.yaml wird von stackctl komplett verwaltet: stackctl schreibt
+# sie nach /opt/learningstack/dex/config/config.yaml bei Setup sowie bei
+# jeder App-Installation/Entfernung (via dex.SaveConfig + docker restart).
+# Darum KEIN configs:-Block — der wuerde stackctls Datei ueberschreiben.
 
-environment:
-  - key: DEX_ISSUER
-    value: "${DEX_AUTH_URL}"
-
-depends_on:
-  - postgres
+depends_on: []
 
 post_install:
   messages:
     - "Dex OIDC-Provider laeuft auf Port 5556"
     - "Konfiguration wird von stackctl automatisch verwaltet"
-    - "OIDC-URL: {DEX_AUTH_URL}"
+    - "OIDC-URL: ${DEX_AUTH_URL}"
