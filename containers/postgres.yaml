@@ -1,6 +1,6 @@
 id: postgres
 name: PostgreSQL
-version: "1.2"
+version: "1.3"
 description: Zentrale Datenbank fuer alle Apps
 category: infrastructure
 
@@ -19,12 +19,17 @@ ports:
     bind: "127.0.0.1"
 
 volumes:
-  # Direkt auf PGDATA mounten — die Postgres-Official-Image Entrypoint
-  # erwartet das Verzeichnis als Mount, nicht das Parent-Dir. Mount auf
-  # /var/lib/postgresql (Parent) fuehrt zu "cannot create directory"
-  # weil die Entrypoint dort keinen Unterordner anlegen kann.
-  - host: /opt/learningstack/postgres/data
-    container: /var/lib/postgresql/data
+  # PG18+ haben das PGDATA auf /var/lib/postgresql/18/docker umgestellt.
+  # Die offizielle Image-Dokumentation (docker-library/postgres PR #1259)
+  # empfiehlt, das Parent-Verzeichnis /var/lib/postgresql zu mounten —
+  # so kann man beim Major-Upgrade pg_upgrade --link nutzen, weil alte
+  # und neue Version auf demselben Volume liegen.
+  # Owner 999:999 = postgres-User im Image; stackctl chownt das Host-
+  # Verzeichnis via Throwaway-Container, weil der Non-Root stackctl-User
+  # das selbst nicht darf.
+  - host: /opt/learningstack/postgres
+    container: /var/lib/postgresql
+    owner: "999:999"
 
 # Bootstrap-Superuser heisst "postgres" — passend zu psql -U postgres, das
 # stackctl fuer SetupAppDB benutzt. Jede App bekommt einen eigenen User/DB

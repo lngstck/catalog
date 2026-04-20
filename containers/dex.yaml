@@ -1,6 +1,6 @@
 id: dex
 name: Dex (OIDC)
-version: "1.1"
+version: "1.2"
 description: OIDC-Provider (Proxy zu moin.schule)
 category: infrastructure
 
@@ -26,8 +26,15 @@ ports:
     bind: "0.0.0.0"
 
 volumes:
+  # Dex laeuft im Image als non-root User 1001:1001 — /data muss uid 1001
+  # gehoeren, damit Dex dort die SQLite-DB schreiben kann.
   - host: /opt/learningstack/dex/data
     container: /data
+    owner: "1001:1001"
+  # /etc/dex wird NICHT gechownt — das Config-Verzeichnis bleibt
+  # stackctl-writable, damit nachfolgende dex.SaveConfig-Aufrufe
+  # (bei jedem App-Install/Remove) funktionieren. Die config.yaml wird
+  # world-readable geschrieben (0644), Dex liest sie als uid 1001.
   - host: /opt/learningstack/dex/config
     container: /etc/dex
     readonly: true
