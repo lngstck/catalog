@@ -40,7 +40,7 @@ environment:
   - key: OAUTH_CLIENT_SECRET
     value: "${OPEN_WEBUI_OIDC_SECRET}"
   - key: OPENID_PROVIDER_URL
-    value: "${DEX_AUTH_URL}"
+    value: "${DEX_AUTH_URL}/.well-known/openid-configuration"
   - key: OAUTH_SCOPES
     value: "openid profile email groups"
   # Anzeige-Name = Vorname (moin.schule liefert aktuell keinen Vollnamen).
