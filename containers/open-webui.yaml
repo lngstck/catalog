@@ -1,12 +1,23 @@
 id: open-webui
 name: Open WebUI
-version: "1.3"
+version: "1.4"
 description: Chat-Oberflaeche fuer LLMs
 category: education
 
 links:
   homepage: https://openwebui.com
   docs: https://docs.openwebui.com
+
+admin_info:
+  login: "admin@{school_slug}.learningstack.online"
+  password_hint: "stackctl-Admin-Passwort"
+  notes: |
+    Der lokale Admin wird nur beim allerersten Start angelegt, wenn die
+    Postgres-Datenbank `open_webui` leer ist. War die App vorher schon
+    installiert, muss beim Entfernen die Option "Daten loeschen" aktiviert
+    sein, damit der Admin neu geseedet wird.
+    OIDC-Schullogin laeuft parallel — Lehrkraefte/Schueler kommen ueber den
+    Schullogin-Button rein und bleiben User.
 
 image:
   name: ghcr.io/open-webui/open-webui
