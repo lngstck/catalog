@@ -1,6 +1,6 @@
 id: open-webui
 name: Open WebUI
-version: "1.2"
+version: "1.3"
 description: Chat-Oberflaeche fuer LLMs
 category: education
 
@@ -50,7 +50,8 @@ environment:
     value: name
   - key: OAUTH_EMAIL_CLAIM
     value: email
-  # Rollen-Mapping: Lehr + Leit = admin, Lern = user
+  # Rollen-Mapping: Lehr/Leit/Lern duerfen rein, aber KEIN OIDC-User wird Admin.
+  # Admin ist ausschliesslich der via WEBUI_ADMIN_* geseedete Account.
   - key: ENABLE_OAUTH_ROLE_MANAGEMENT
     value: "true"
   - key: OAUTH_ROLES_CLAIM
@@ -58,7 +59,15 @@ environment:
   - key: OAUTH_ALLOWED_ROLES
     value: "Lehr,Leit,Lern"
   - key: OAUTH_ADMIN_ROLES
-    value: "Lehr,Leit"
+    value: ""
+  # Lokaler Admin-Account beim ersten Start anlegen (verhindert, dass der
+  # erste OIDC-Login automatisch Admin wird). Login via /auth-Formular.
+  - key: WEBUI_ADMIN_EMAIL
+    value: "admin@${SCHOOL_SLUG}.learningstack.online"
+  - key: WEBUI_ADMIN_PASSWORD
+    value: "${ADMIN_PASSWORD}"
+  - key: WEBUI_ADMIN_NAME
+    value: "Admin"
   # PostgreSQL statt SQLite — eigener User/DB pro App (stackctl legt sie an).
   - key: DATABASE_URL
     value: "postgresql://open_webui:${OPEN_WEBUI_DB_PASSWORD}@ls-postgres:5432/open_webui"
@@ -75,11 +84,17 @@ environment:
     value: "${SCHOOL_NAME} KI-Chat"
   - key: DEFAULT_USER_ROLE
     value: user
-  # Signup deaktivieren — alle User kommen ueber OIDC
+  # Signup deaktivieren — neue User kommen ueber OIDC, lokal nur der Admin.
   - key: ENABLE_SIGNUP
     value: "false"
+  - key: ENABLE_LOGIN_FORM
+    value: "true"
   - key: WEBUI_AUTH
     value: "true"
+  # env-Werte MUESSEN bei jedem Start gewinnen, sonst friert Open WebUI die
+  # OIDC-/Admin-Einstellungen nach dem ersten Lauf in der DB ein.
+  - key: ENABLE_PERSISTENT_CONFIG
+    value: "false"
 
 secrets:
   - key: OPEN_WEBUI_OIDC_SECRET
@@ -99,8 +114,8 @@ global_env:
 post_install:
   messages:
     - "Open WebUI: http://{server_domain}:8310"
-    - "Login ueber Schullogin (OIDC via Dex)"
-    - "Lehrer (Lehr/Leit) erhalten Admin-Rechte"
+    - "Lokaler Admin: admin@{school_slug}.learningstack.online + stackctl-Admin-Passwort"
+    - "Lehrkraefte/Schueler melden sich ueber Schullogin (OIDC via Dex) an — alle als User"
     - "OIDC funktioniert nur mit aktivem Tunnel"
   secrets_to_show:
     - key: OPEN_WEBUI_OIDC_SECRET
