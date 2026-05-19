@@ -20,12 +20,12 @@ ports:
 volumes:
   # llmd liest config.yaml + prompts/ aus /etc/llmd. stackctl schreibt diese
   # Dateien direkt in das Host-Verzeichnis und schickt SIGHUP fuer Reload.
-  # Container laeuft als non-root (1001:1001 — image-default von distroless),
-  # daher chown auf dieses uid:gid via Throwaway-Container.
+  # Read-only Mount, daher KEIN owner: — stackctl-User muss schreiben koennen,
+  # 0o755/0o644 (von paths.EnsureDir/AtomicWrite gesetzt) reicht dem 1001-User
+  # zum Lesen. Siehe ARCHITECTURE.md §16.2.
   - host: /opt/learningstack/llmd/config
     container: /etc/llmd
     readonly: true
-    owner: "1001:1001"
 
 depends_on: []
 
