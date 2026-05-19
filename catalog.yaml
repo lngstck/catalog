@@ -8,16 +8,16 @@ apps:
     name: Dex (OIDC)
     category: infrastructure
     description: OIDC-Provider (Proxy zu moin.schule)
+  - id: llmd
+    name: LLM-Gateway
+    category: infrastructure
+    description: LLM-Proxy mit Persona-Layer (OpenAI-kompatibel)
   - id: open-webui
     name: Open WebUI
     category: education
     description: Chat-Oberflaeche fuer LLMs
 
 global_env_schema:
-  - key: LLM_ENDPOINT
-    description: OpenAI-kompatibler LLM-Endpunkt
-    required: false
-    default: https://llm.learningstack.online/v1
   - key: LLM_API_KEY
-    description: API-Key fuer LLM-Proxy
+    description: API-Key fuer den lokalen llmd-Gateway (automatisch beim llmd-Install gesetzt)
     required: false
