@@ -1,6 +1,7 @@
 id: open-webui
 name: Open WebUI
-version: "1.5"
+version: "1.6"
+breaking: true
 description: Chat-Oberflaeche fuer LLMs
 category: education
 
@@ -35,6 +36,7 @@ volumes:
 depends_on:
   - postgres
   - dex
+  - llmd
 
 oidc:
   client_id: open-webui
@@ -82,9 +84,11 @@ environment:
   # PostgreSQL statt SQLite — eigener User/DB pro App (stackctl legt sie an).
   - key: DATABASE_URL
     value: "postgresql://open_webui:${OPEN_WEBUI_DB_PASSWORD}@ls-postgres:5432/open_webui"
-  # LLM-Anbindung
+  # LLM-Anbindung — laeuft lokal ueber das llmd-Gateway, das stackctl bei
+  # der llmd-Installation als LLM_API_KEY in die globale .env-Section
+  # schreibt. Open WebUI sieht die schul-eigenen Personas als "Modelle".
   - key: OPENAI_API_BASE_URL
-    value: "${LLM_ENDPOINT}"
+    value: "http://ls-llmd:8000/v1"
   - key: OPENAI_API_KEY
     value: "${LLM_API_KEY}"
   # Session-Secret
@@ -114,13 +118,9 @@ secrets:
     generate: secret
 
 global_env:
-  - key: LLM_ENDPOINT
-    description: OpenAI-kompatibler LLM-Endpunkt
-    required: false
-    default: https://llm.learningstack.online/v1
   - key: LLM_API_KEY
-    description: API-Key fuer LLM-Proxy
-    required: false
+    description: API-Key fuer den lokalen llmd-Gateway (von stackctl beim llmd-Install generiert)
+    required: true
 
 post_install:
   messages:
@@ -128,6 +128,8 @@ post_install:
     - "Lokaler Admin: admin@{school_slug}.learningstack.online + stackctl-Admin-Passwort"
     - "Lehrkraefte/Schueler melden sich ueber Schullogin (OIDC via Dex) an — alle als User"
     - "OIDC funktioniert nur mit aktivem Tunnel"
+    - "LLM-Backend: lokales llmd-Gateway. Welche Modelle sichtbar sind regelt das"
+    - "Open-WebUI-Admin-Panel: Admin -> Models -> Sharing pro Benutzer-Gruppe."
   secrets_to_show:
     - key: OPEN_WEBUI_OIDC_SECRET
       label: OIDC-Secret
