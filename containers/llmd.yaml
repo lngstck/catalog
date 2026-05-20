@@ -1,6 +1,6 @@
 id: llmd
 name: LLM-Gateway
-version: "0.1.0"
+version: "0.2.0"
 description: LLM-Proxy mit Persona-Layer (OpenAI-kompatibel)
 category: infrastructure
 
@@ -9,7 +9,7 @@ links:
 
 image:
   name: ghcr.io/lngstck/llmd
-  tag: "0.1.0"
+  tag: "0.2.0"
 
 ports:
   - host: 8320
@@ -18,8 +18,9 @@ ports:
     bind: "0.0.0.0"
 
 volumes:
-  # llmd liest config.yaml + prompts/ aus /etc/llmd. stackctl schreibt diese
-  # Dateien direkt in das Host-Verzeichnis und schickt SIGHUP fuer Reload.
+  # llmd liest config.yaml aus /etc/llmd. stackctl schreibt sie direkt in
+  # das Host-Verzeichnis und schickt SIGHUP fuer Reload. Schema v2 inlined
+  # Provider-Keys und Persona-Prompts in dieser einen Datei.
   # Read-only Mount, daher KEIN owner: — stackctl-User muss schreiben koennen,
   # 0o755/0o644 (von paths.EnsureDir/AtomicWrite gesetzt) reicht dem 1001-User
   # zum Lesen. Siehe ARCHITECTURE.md §16.2.
@@ -33,24 +34,20 @@ depends_on: []
 # laeuft per API-Key (bcrypt-gehasht in config.yaml). Die anrufende App
 # (Open WebUI etc.) macht ggf. eigene Per-Group-Permissions.
 #
-# Bewusst KEIN environment:-Block — die gesamte Konfiguration lebt in
-# /etc/llmd/config.yaml, von stackctl gepflegt.
-#
-# Provider-API-Keys (PROVIDER_OPENAI_KEY etc.) MUESSEN in .env vorhanden
-# sein, bevor Requests ans jeweilige Provider durchgehen. Werden ueber
-# `stackctl llm provider add` referenziert und vom Admin selbst in .env
-# gepflegt (kein Auto-Generate — sind eigene Secrets der Schule).
+# Bewusst KEIN environment:-Block — die gesamte Konfiguration inkl.
+# Provider-API-Keys lebt seit Schema v2 in /etc/llmd/config.yaml, von
+# stackctl gepflegt. Kein PROVIDER_*_KEY in .env mehr.
 
 post_install:
   messages:
     - "LLM-Gateway laeuft auf Port 8320."
     - "Naechste Schritte zur Inbetriebnahme:"
-    - "  1. Provider-API-Key in /opt/stackctl/compose/.env eintragen (z.B. PROVIDER_OPENAI_KEY=sk-...)"
-    - "  2. stackctl llm provider add --id openai --base-url https://api.openai.com --api-key-env PROVIDER_OPENAI_KEY"
-    - "  3. stackctl llm model add --id <id> --provider openai --upstream-id <upstream>"
-    - "  4. stackctl llm persona set-model grundschul-erklaerer <model-id>"
-    - "  5. stackctl llm persona set-model sek2-helfer <model-id>"
-    - "  6. In Open WebUI: Admin -> Models -> Personas fuer Benutzer-Gruppen freigeben"
+    - "  1. stackctl llm provider add --id openai --base-url https://api.openai.com --api-key-stdin"
+    - "     (Key per stdin paste, damit er nicht in der Shell-History landet)"
+    - "  2. stackctl llm persona set grundschul-erklaerer --provider openai --upstream-id gpt-4o-mini"
+    - "  3. stackctl llm persona set sek2-helfer --provider openai --upstream-id gpt-4o"
+    - "  4. In Open WebUI: Admin -> Models -> Personas fuer Benutzer-Gruppen freigeben"
     - ""
-    - "Beispiel-Personas (grundschul-erklaerer, sek2-helfer) sind bereits angelegt,"
-    - "warten aber auf Modell-Zuweisung. Eigene Personas: 'stackctl llm persona add'."
+    - "Beispiel-Personas (grundschul-erklaerer, sek2-helfer) sind bereits angelegt"
+    - "und tragen ihren System-Prompt inline. Eigene Personas: 'stackctl llm persona add'."
+    - "Passthrough (ohne System-Prompt): zusaetzlich '--no-prompt' beim Anlegen."
