@@ -1,6 +1,6 @@
 id: pylearn
 name: PyLearn
-version: "0.2.0"
+version: "0.2.1"
 description: KI-gestuetzte Python-Lernumgebung mit Pyodide, ACE-Editor und Lehrer-Dashboard
 category: education
 
@@ -9,7 +9,7 @@ links:
 
 image:
   name: ghcr.io/lngstck/pylearn
-  tag: "0.2.0"
+  tag: "0.2.1"
 
 ports:
   - host: 8330
