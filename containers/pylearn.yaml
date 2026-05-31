@@ -1,0 +1,106 @@
+id: pylearn
+name: PyLearn
+version: "0.2.0"
+description: KI-gestuetzte Python-Lernumgebung mit Pyodide, ACE-Editor und Lehrer-Dashboard
+category: education
+
+links:
+  homepage: https://github.com/lngstck/learningstack
+
+image:
+  name: ghcr.io/lngstck/pylearn
+  tag: "0.2.0"
+
+ports:
+  - host: 8330
+    container: 8000
+    description: Web UI
+
+volumes:
+  - host: /opt/learningstack/pylearn/data
+    container: /data
+    owner: "10100:10100"
+
+depends_on:
+  - postgres
+  - dex
+  - llmd
+
+oidc:
+  client_id: pylearn
+  redirect_path: /auth/callback
+
+secrets:
+  - key: PYLEARN_OIDC_SECRET
+    generate: secret
+  - key: PYLEARN_DB_PASSWORD
+    generate: password
+  - key: PYLEARN_SESSION_SECRET
+    generate: secret
+
+environment:
+  # OIDC via lokaler Dex
+  - key: OIDC_ISSUER
+    value: "${DEX_AUTH_URL}"
+  - key: OIDC_CLIENT_ID
+    value: "pylearn"
+  - key: OIDC_CLIENT_SECRET
+    value: "${PYLEARN_OIDC_SECRET}"
+  - key: OIDC_REDIRECT_URI
+    value: "https://pylearn.${SCHOOL_SLUG}.learningstack.online/auth/callback"
+  # Rollen-Defaults entsprechen den moin.schule-/zentraler-Dex-Konventionen
+  # (siehe tools/central-dex/ + memory project_central_dex_moinschule.md).
+  # Operator kann pro Schule via stackctl set ueberschreiben.
+  - key: OAUTH_TEACHER_ROLES
+    value: "Lehr,Leit"
+  - key: OAUTH_STUDENT_ROLES
+    value: "Lern"
+  # Session-Cookie nur ueber HTTPS (Tunnel terminiert TLS).
+  - key: PYLEARN_SECURE_COOKIES
+    value: "true"
+  # KI-Anfragen pro Schueler:in (0 = aus). Schuetzt vor Token-Kosten.
+  - key: PYLEARN_AI_RATE_LIMIT_HOUR
+    value: "60"
+  - key: PYLEARN_AI_RATE_LIMIT_DAY
+    value: "300"
+  # PostgreSQL — eigene DB, von stackctl angelegt
+  - key: DATABASE_URL
+    value: "postgresql+psycopg://pylearn:${PYLEARN_DB_PASSWORD}@ls-postgres:5432/pylearn"
+  # LLM via llmd-Gateway
+  - key: OPENAI_API_BASE_URL
+    value: "http://ls-llmd:8000/v1"
+  - key: OPENAI_API_KEY
+    value: "${LLM_API_KEY}"
+  # Session
+  - key: SESSION_SECRET
+    value: "${PYLEARN_SESSION_SECRET}"
+  # App-Konfig
+  - key: APP_NAME
+    value: "PyLearn"
+  - key: DATA_DIR
+    value: "/data"
+
+global_env:
+  - key: SCHOOL_NAME
+    description: Schulname (fuer Anzeige in der App)
+    required: false
+  - key: SCHOOL_SLUG
+    description: URL-sicherer Schulkuerzel
+    required: false
+  - key: DEX_AUTH_URL
+    description: Dex-OIDC-Base-URL
+    required: false
+  - key: LLM_API_KEY
+    description: API-Key fuer den lokalen llmd-Gateway
+    required: true
+
+post_install:
+  messages:
+    - "PyLearn: http://{server_domain}:8330"
+    - "Oeffentlich: https://pylearn.{SCHOOL_SLUG}.learningstack.online (Tunnel muss aktiviert sein fuer OIDC-Login)"
+    - "Erste Schritte: Als Lehrkraft anmelden, unter /admin/llm-config eine Persona auswaehlen, dann Lerngruppen anlegen"
+  secrets_to_show:
+    - key: PYLEARN_OIDC_SECRET
+      label: OIDC-Secret
+    - key: PYLEARN_SESSION_SECRET
+      label: Session-Secret
