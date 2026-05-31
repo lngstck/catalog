@@ -16,6 +16,10 @@ apps:
     name: Open WebUI
     category: education
     description: Chat-Oberflaeche fuer LLMs
+  - id: pylearn
+    name: PyLearn
+    category: education
+    description: KI-gestuetzte Python-Lernumgebung mit Pyodide, ACE-Editor und Lehrer-Dashboard
 
 global_env_schema:
   - key: LLM_API_KEY
