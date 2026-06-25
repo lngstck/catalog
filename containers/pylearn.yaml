@@ -9,7 +9,7 @@ links:
 
 image:
   name: ghcr.io/lngstck/pylearn
-  tag: "0.2.1"
+  tag: "0.2.2"
 
 ports:
   - host: 8330
