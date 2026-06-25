@@ -1,6 +1,6 @@
 id: pylearn
 name: PyLearn
-version: "0.2.1"
+version: "0.2.2"
 description: KI-gestuetzte Python-Lernumgebung mit Pyodide, ACE-Editor und Lehrer-Dashboard
 category: education
 
