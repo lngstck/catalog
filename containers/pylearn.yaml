@@ -75,6 +75,8 @@ environment:
   - key: SESSION_SECRET
     value: "${PYLEARN_SESSION_SECRET}"
   # App-Konfig
+  - key: SCHOOL_NAME
+    value: "${SCHOOL_NAME}"
   - key: APP_NAME
     value: "PyLearn"
   - key: DATA_DIR
