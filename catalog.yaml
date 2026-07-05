@@ -20,6 +20,10 @@ apps:
     name: PyLearn
     category: education
     description: KI-gestuetzte Python-Lernumgebung mit Pyodide, ACE-Editor und Lehrer-Dashboard
+  - id: sponsorenlauf
+    name: Sponsorenlauf
+    category: education
+    description: Sponsorenlauf-Verwaltung mit RFID-Rundenzaehlung und Sponsor-Selbsteintragung
 
 global_env_schema:
   - key: LLM_API_KEY

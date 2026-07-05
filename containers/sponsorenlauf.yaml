@@ -1,0 +1,112 @@
+id: sponsorenlauf
+name: Sponsorenlauf
+version: "0.1.0"
+description: Sponsorenlauf-Verwaltung mit RFID-Rundenzaehlung und Sponsor-Selbsteintragung
+category: education
+
+links:
+  homepage: https://github.com/lngstck/sponsorenlauf
+
+admin_info:
+  notes: |
+    Die App hat bewusst KEIN Admin-Web-UI. Verwaltung (Laeufe, Laeufer:innen,
+    CSV-Import, RFID-Enrollment mit Labeldruck) laeuft ueber das lokale
+    Admin-Tool auf dem Rechner der Verwaltung:
+    uvx --from "git+https://github.com/lngstck/sponsorenlauf@v0.1.0#subdirectory=admin-tool" sponsorenlauf-admin
+    Das Tool fragt beim ersten Start Server-URL und das bei der Installation
+    angezeigte Admin-Token ab. Lehrkraefte melden sich per Schullogin (OIDC)
+    an; Laeufer:innen erreichen ihr Sponsorenformular ueber den persoenlichen
+    Link/QR-Code (kein Login).
+
+image:
+  name: ghcr.io/lngstck/sponsorenlauf
+  tag: "0.1.0"
+
+ports:
+  - host: 8340          # stackweit eindeutig (open-webui 8310, llmd 8320, pylearn 8330)
+    container: 8000
+    description: Web-UI
+
+volumes:
+  - host: /opt/learningstack/sponsorenlauf/data
+    container: /data
+    owner: "10200:10200"
+
+depends_on:
+  - postgres
+  - dex
+
+oidc:
+  client_id: sponsorenlauf
+  redirect_path: /auth/callback
+
+secrets:
+  - key: SPONSORENLAUF_OIDC_SECRET
+    generate: secret
+  - key: SPONSORENLAUF_DB_PASSWORD
+    generate: password
+  - key: SPONSORENLAUF_SESSION_SECRET
+    generate: secret
+  - key: SPONSORENLAUF_INGEST_TOKEN
+    generate: api_key
+    prefix: slauf
+  - key: SPONSORENLAUF_ADMIN_TOKEN
+    generate: api_key
+    prefix: sladm
+
+environment:
+  # --- OIDC (Lehrkraft-Login) ---
+  - key: OIDC_ISSUER
+    value: "${DEX_AUTH_URL}"
+  - key: OIDC_CLIENT_ID
+    value: "sponsorenlauf"
+  - key: OIDC_CLIENT_SECRET
+    value: "${SPONSORENLAUF_OIDC_SECRET}"
+  - key: OIDC_REDIRECT_URI
+    value: "https://sponsorenlauf.${SCHOOL_SLUG}.learningstack.online/auth/callback"
+  - key: OAUTH_TEACHER_ROLES
+    value: "Lehr,Leit"
+  - key: OAUTH_STUDENT_ROLES
+    value: "Lern"
+  # --- Datenbank ---
+  - key: DATABASE_URL
+    value: "postgresql+psycopg://sponsorenlauf:${SPONSORENLAUF_DB_PASSWORD}@ls-postgres:5432/sponsorenlauf"
+  # --- Verwaltungs-API fuer das lokale Admin-Tool (getrennt von OIDC) ---
+  - key: SPONSORENLAUF_ADMIN_TOKEN
+    value: "${SPONSORENLAUF_ADMIN_TOKEN}"
+  # --- Scan-Ingest (Raspberry-Pi-Stationen) ---
+  - key: SPONSORENLAUF_INGEST_TOKEN
+    value: "${SPONSORENLAUF_INGEST_TOKEN}"
+  # --- Session / Sicherheit ---
+  - key: SESSION_SECRET
+    value: "${SPONSORENLAUF_SESSION_SECRET}"
+  - key: SPONSORENLAUF_SECURE_COOKIES
+    value: "true"
+  # --- Anzeige ---
+  - key: SCHOOL_NAME
+    value: "${SCHOOL_NAME}"
+  - key: SCHOOL_SLUG
+    value: "${SCHOOL_SLUG}"
+
+global_env:
+  - key: SCHOOL_NAME
+    description: Schulname (Anzeige)
+    required: false
+  - key: SCHOOL_SLUG
+    description: URL-sicherer Schulkuerzel
+    required: false
+  - key: DEX_AUTH_URL
+    description: Dex-OIDC-Base-URL
+    required: false
+
+post_install:
+  messages:
+    - "Sponsorenlauf lokal: http://{server_domain}:8340"
+    - "Oeffentlich: https://sponsorenlauf.{SCHOOL_SLUG}.learningstack.online (Tunnel muss aktiv sein)"
+    - "Verwaltung ueber das lokale Admin-Tool (siehe App-Detail) — Admin-Token unten notieren!"
+    - "Scanstationen posten gegen POST /api/scan mit dem Ingest-Token."
+  secrets_to_show:
+    - key: SPONSORENLAUF_INGEST_TOKEN
+      label: Ingest-Token fuer die Scanstationen
+    - key: SPONSORENLAUF_ADMIN_TOKEN
+      label: Admin-Token fuer das Verwaltungs-Tool (/api/admin)
