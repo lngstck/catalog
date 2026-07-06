@@ -1,6 +1,6 @@
 id: sponsorenlauf
 name: Sponsorenlauf
-version: "0.1.0"
+version: "0.1.1"
 description: Sponsorenlauf-Verwaltung mit RFID-Rundenzaehlung und Sponsor-Selbsteintragung
 category: education
 
@@ -11,8 +11,9 @@ admin_info:
   notes: |
     Die App hat bewusst KEIN Admin-Web-UI. Verwaltung (Laeufe, Laeufer:innen,
     CSV-Import, RFID-Enrollment mit Labeldruck) laeuft ueber das lokale
-    Admin-Tool auf dem Rechner der Verwaltung:
-    uvx --from "git+https://github.com/lngstck/sponsorenlauf@v0.1.0#subdirectory=admin-tool" sponsorenlauf-admin
+    Admin-Tool auf dem Rechner der Verwaltung. Der Server liefert das Tool
+    selbst aus — Anleitung und fertiger Startbefehl unter:
+    https://sponsorenlauf.{school_slug}.learningstack.online/admin
     Das Tool fragt beim ersten Start Server-URL und das bei der Installation
     angezeigte Admin-Token ab. Lehrkraefte melden sich per Schullogin (OIDC)
     an; Laeufer:innen erreichen ihr Sponsorenformular ueber den persoenlichen
@@ -20,7 +21,7 @@ admin_info:
 
 image:
   name: ghcr.io/lngstck/sponsorenlauf
-  tag: "0.1.0"
+  tag: "0.1.1"
 
 ports:
   - host: 8340          # stackweit eindeutig (open-webui 8310, llmd 8320, pylearn 8330)
@@ -103,7 +104,7 @@ post_install:
   messages:
     - "Sponsorenlauf lokal: http://{server_domain}:8340"
     - "Oeffentlich: https://sponsorenlauf.{SCHOOL_SLUG}.learningstack.online (Tunnel muss aktiv sein)"
-    - "Verwaltung ueber das lokale Admin-Tool (siehe App-Detail) — Admin-Token unten notieren!"
+    - "Verwaltung: lokales Admin-Tool — Anleitung unter https://sponsorenlauf.{SCHOOL_SLUG}.learningstack.online/admin — Admin-Token unten notieren!"
     - "Scanstationen posten gegen POST /api/scan mit dem Ingest-Token."
   secrets_to_show:
     - key: SPONSORENLAUF_INGEST_TOKEN
