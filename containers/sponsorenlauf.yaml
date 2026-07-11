@@ -1,6 +1,6 @@
 id: sponsorenlauf
 name: Sponsorenlauf
-version: "0.2.0"
+version: "0.3.0"
 description: Sponsorenlauf-Verwaltung mit RFID-Rundenzaehlung und Sponsor-Selbsteintragung
 category: education
 
@@ -21,7 +21,7 @@ admin_info:
 
 image:
   name: ghcr.io/lngstck/sponsorenlauf
-  tag: "0.2.0"
+  tag: "0.3.0"
 
 ports:
   - host: 8340          # stackweit eindeutig (open-webui 8310, llmd 8320, pylearn 8330)
@@ -36,6 +36,9 @@ volumes:
 depends_on:
   - postgres
   - dex
+  # llmd optional: liefert Anfeuerung (Live-Ansicht) + Abschlussbericht.
+  # Fehlt es, laeuft die App normal weiter (statische Sprueche, kein Bericht).
+  - llmd
 
 oidc:
   client_id: sponsorenlauf
@@ -78,6 +81,11 @@ environment:
   # --- Scan-Ingest (Raspberry-Pi-Stationen) ---
   - key: SPONSORENLAUF_INGEST_TOKEN
     value: "${SPONSORENLAUF_INGEST_TOKEN}"
+  # --- LLM (optional): Anfeuerung + Abschlussbericht ueber den llmd-Gateway ---
+  - key: OPENAI_API_BASE_URL
+    value: "http://ls-llmd:8000/v1"
+  - key: OPENAI_API_KEY
+    value: "${LLM_API_KEY}"
   # --- Session / Sicherheit ---
   - key: SESSION_SECRET
     value: "${SPONSORENLAUF_SESSION_SECRET}"
@@ -98,6 +106,9 @@ global_env:
     required: false
   - key: DEX_AUTH_URL
     description: Dex-OIDC-Base-URL
+    required: false
+  - key: LLM_API_KEY
+    description: API-Key fuer den lokalen llmd-Gateway (optional, aktiviert Anfeuerung + Bericht)
     required: false
 
 post_install:
