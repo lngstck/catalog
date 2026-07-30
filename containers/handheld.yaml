@@ -1,0 +1,106 @@
+id: handheld
+name: Handheld
+version: "0.1.0"
+description: CircuitPython-Editor fuer die schulische ESP32-Handheld-Konsole, mit Projektablage und Lehrer-Leseansicht
+category: education
+
+links:
+  homepage: https://github.com/lngstck/handheld
+
+admin_info:
+  notes: |
+    Die App hat kein separates Admin-UI — Lehrkraefte und Schueler:innen
+    melden sich per Schullogin (OIDC) an, die Rolle kommt aus den
+    groups-Claims. Lehrkraefte sehen unter /lehrer alle Schueler:innen der
+    Instanz mit ihren Projekten (schreibgeschuetzt, kein Klassen-/Kursmodell).
+
+    WICHTIG — Web Serial: Der Editor spricht das Board per USB ueber die
+    Web-Serial-API an. Die braucht einen Secure Context, funktioniert also
+    NUR ueber die oeffentliche HTTPS-Tunnel-URL, nicht ueber
+    http://<server>:8350. Der lokale Port ist nur fuer Diagnose gedacht.
+    Client-Anforderungen: Chrome/Edge (kein Firefox/Safari) und Zugriff auf
+    den USB-Port des Schul-PCs.
+
+image:
+  name: ghcr.io/lngstck/handheld
+  tag: "0.1.0"
+
+ports:
+  - host: 8350          # stackweit eindeutig (open-webui 8310, llmd 8320, pylearn 8330, sponsorenlauf 8340)
+    container: 8000
+    description: Web-UI (Editor + Projekte); Web Serial nur ueber die Tunnel-URL
+
+# Kein Volume: Projekte, Dateien und Snapshots liegen komplett in Postgres.
+# Der Editor-Build ist Teil des Images. Updates sind damit zustandslos.
+
+depends_on:
+  - postgres
+  - dex
+  # Kein llmd: der KI-Chat kommt erst in einer spaeteren Phase, dann als
+  # optionale Dependency mit graceful degradation.
+
+oidc:
+  client_id: handheld
+  redirect_path: /auth/callback
+
+secrets:
+  - key: HANDHELD_OIDC_SECRET
+    generate: secret
+  - key: HANDHELD_DB_PASSWORD
+    generate: password
+  - key: HANDHELD_SESSION_SECRET
+    generate: secret
+
+environment:
+  # --- OIDC (Login fuer Lehrkraefte und Schueler:innen) ---
+  - key: OIDC_ISSUER
+    value: "${DEX_AUTH_URL}"
+  - key: OIDC_CLIENT_ID
+    value: "handheld"
+  - key: OIDC_CLIENT_SECRET
+    value: "${HANDHELD_OIDC_SECRET}"
+  - key: OIDC_REDIRECT_URI
+    value: "https://handheld.${SCHOOL_SLUG}.learningstack.online/auth/callback"
+  # Rollen-Defaults nach moin.schule-/zentraler-Dex-Konvention;
+  # Operator kann pro Schule via stackctl set ueberschreiben.
+  - key: OAUTH_TEACHER_ROLES
+    value: "Lehr,Leit"
+  - key: OAUTH_STUDENT_ROLES
+    value: "Lern"
+  # --- Datenbank ---
+  - key: DATABASE_URL
+    value: "postgresql+psycopg://handheld:${HANDHELD_DB_PASSWORD}@ls-postgres:5432/handheld"
+  # --- Session / Sicherheit ---
+  - key: SESSION_SECRET
+    value: "${HANDHELD_SESSION_SECRET}"
+  # Session-Cookie nur ueber HTTPS (Tunnel terminiert TLS).
+  - key: HANDHELD_SECURE_COOKIES
+    value: "true"
+  # HANDHELD_DEV_LOGIN wird absichtlich NICHT gesetzt — der Dev-Login-Bypass
+  # ist ausschliesslich fuer die lokale compose.dev und ist ohne die Variable
+  # deaktiviert.
+  # --- Anzeige ---
+  - key: APP_NAME
+    value: "Handheld"
+  - key: SCHOOL_NAME
+    value: "${SCHOOL_NAME}"
+  - key: SCHOOL_SLUG
+    value: "${SCHOOL_SLUG}"
+
+global_env:
+  - key: SCHOOL_NAME
+    description: Schulname (Anzeige)
+    required: false
+  - key: SCHOOL_SLUG
+    description: URL-sicherer Schulkuerzel
+    required: false
+  - key: DEX_AUTH_URL
+    description: Dex-OIDC-Base-URL
+    required: false
+
+post_install:
+  messages:
+    - "Handheld oeffentlich: https://handheld.{SCHOOL_SLUG}.learningstack.online (Tunnel muss aktiv sein — sowohl fuer den OIDC-Login als auch fuer Web Serial)"
+    - "Lokal nur zur Diagnose: http://{server_domain}:8350 — ueber diese Adresse laesst sich KEIN Board verbinden (Web Serial braucht HTTPS)"
+    - "Erste Schritte: Als Lehrkraft anmelden (Uebersicht unter /lehrer), Schueler:innen legen unter /projekte ihr erstes Projekt an und oeffnen es im Editor."
+    - "Am Schul-PC: Chrome oder Edge, Board per USB anstecken, im Editor auf Verbinden — CircuitPython muss auf dem Board laufen."
