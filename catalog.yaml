@@ -24,6 +24,10 @@ apps:
     name: Sponsorenlauf
     category: education
     description: Sponsorenlauf-Verwaltung mit RFID-Rundenzaehlung und Sponsor-Selbsteintragung
+  - id: handheld
+    name: Handheld
+    category: education
+    description: CircuitPython-Editor fuer die schulische ESP32-Handheld-Konsole, mit Projektablage und Lehrer-Leseansicht
 
 global_env_schema:
   - key: LLM_API_KEY
