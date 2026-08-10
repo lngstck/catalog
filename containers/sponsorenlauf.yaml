@@ -19,6 +19,13 @@ admin_info:
     an; Laeufer:innen erreichen ihr Sponsorenformular ueber den persoenlichen
     Link/QR-Code (kein Login).
 
+    Die Raspberry-Pi-Scanstationen holen ihren Dienst ebenfalls vom Server —
+    Anleitung, Script und systemd-Unit (kein GitHub-Zugriff noetig) unter:
+    https://sponsorenlauf.{school_slug}.learningstack.online/station
+    Der Erststart auf dem Pi fragt Server-URL, das bei der Installation
+    angezeigte Ingest-Token und die Event-ID des Laufs ab; das Token landet
+    in /etc/sponsorenlauf-station.conf und nie im Script.
+
 image:
   name: ghcr.io/lngstck/sponsorenlauf
   tag: "0.4.0"
@@ -114,9 +121,9 @@ global_env:
 post_install:
   messages:
     - "Sponsorenlauf lokal: http://{server_domain}:8340"
-    - "Oeffentlich: https://sponsorenlauf.{SCHOOL_SLUG}.learningstack.online (Tunnel muss aktiv sein)"
-    - "Verwaltung: lokales Admin-Tool — Anleitung unter https://sponsorenlauf.{SCHOOL_SLUG}.learningstack.online/admin — Admin-Token unten notieren!"
-    - "Scanstationen posten gegen POST /api/scan mit dem Ingest-Token."
+    - "Oeffentlich: https://sponsorenlauf.${SCHOOL_SLUG}.learningstack.online (Tunnel muss aktiv sein)"
+    - "Verwaltung: lokales Admin-Tool — Anleitung unter https://sponsorenlauf.${SCHOOL_SLUG}.learningstack.online/admin — Admin-Token unten notieren!"
+    - "Scanstationen (Raspberry Pi): Anleitung + Dienst unter https://sponsorenlauf.${SCHOOL_SLUG}.learningstack.online/station — Ingest-Token unten notieren!"
   secrets_to_show:
     - key: SPONSORENLAUF_INGEST_TOKEN
       label: Ingest-Token fuer die Scanstationen
