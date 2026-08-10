@@ -1,6 +1,6 @@
 id: sponsorenlauf
 name: Sponsorenlauf
-version: "0.3.0"
+version: "0.4.0"
 description: Sponsorenlauf-Verwaltung mit RFID-Rundenzaehlung und Sponsor-Selbsteintragung
 category: education
 
@@ -21,7 +21,7 @@ admin_info:
 
 image:
   name: ghcr.io/lngstck/sponsorenlauf
-  tag: "0.3.0"
+  tag: "0.4.0"
 
 ports:
   - host: 8340          # stackweit eindeutig (open-webui 8310, llmd 8320, pylearn 8330)
