@@ -8,6 +8,10 @@ apps:
     name: Dex (OIDC)
     category: infrastructure
     description: OIDC-Provider (Proxy zu moin.schule)
+  - id: caddy
+    name: Reverse-Proxy (Caddy)
+    category: infrastructure
+    description: TLS und Hostname-Routing fuer Server, die direkt am Internet haengen
   - id: llmd
     name: LLM-Gateway
     category: infrastructure
