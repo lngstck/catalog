@@ -1,0 +1,67 @@
+id: caddy
+name: Reverse-Proxy (Caddy)
+version: "1.0"
+description: TLS-Terminierung und Hostname-Routing fuer Installationen, die direkt am Internet haengen
+category: infrastructure
+
+links:
+  homepage: https://caddyserver.com
+
+admin_info:
+  notes: |
+    Wird nur bei der Betriebsart "direkt" gebraucht: der Server haelt Port 80
+    und 443 selbst, terminiert TLS und leitet anhand des Hostnamens an die
+    passende App weiter. Bei Betrieb ueber einen Relay-Tunnel ist dieser
+    Dienst ueberfluessig.
+
+    Die Zertifikate holt und erneuert Caddy selbst ueber Let's Encrypt
+    (HTTP-01). Voraussetzung: *.{public_base_domain} zeigt im DNS auf diesen
+    Server, und Port 80 ist aus dem Internet erreichbar — ohne Port 80
+    scheitert die Erneuerung still, bis das Zertifikat ablaeuft.
+
+    Die Konfiguration (/etc/caddy/Caddyfile) erzeugt stackctl vollstaendig
+    selbst und laedt sie bei jeder Aenderung neu. Nicht von Hand editieren —
+    die Datei wird ueberschrieben.
+
+image:
+  name: caddy
+  tag: "2-alpine"
+
+# Dieser Container IST der oeffentliche Zugang. Seine Ports bleiben deshalb
+# auf 0.0.0.0, auch wenn stackctl alle uebrigen Apps auf 127.0.0.1 bindet.
+public_entrypoint: true
+
+ports:
+  - host: 80
+    container: 80
+    description: HTTP (Weiterleitung auf HTTPS + ACME-Challenge)
+  - host: 443
+    container: 443
+    description: HTTPS
+
+volumes:
+  # Zertifikate und der ACME-Account. Gehoert unbedingt ins Backup: ohne
+  # diese Daten holt Caddy nach einer Wiederherstellung neue Zertifikate,
+  # und Let's Encrypt erlaubt nur fuenf gleiche pro Woche.
+  - host: /opt/learningstack/caddy/data
+    container: /data
+  - host: /opt/learningstack/caddy/state
+    container: /config
+  # Von stackctl generierte Konfiguration.
+  - host: /opt/learningstack/caddy/config
+    container: /etc/caddy
+    readonly: true
+
+command:
+  - caddy
+  - run
+  - --config
+  - /etc/caddy/Caddyfile
+  - --adapter
+  - caddyfile
+
+post_install:
+  messages:
+    - "Caddy laeuft. Die Zertifikate holt er beim ersten Aufruf einer Adresse automatisch."
+    - "Voraussetzung: *.{public_base_domain} zeigt im DNS auf diesen Server und Port 80/443 sind aus dem Internet erreichbar."
+    - "Die Konfiguration erzeugt stackctl selbst — /etc/caddy/Caddyfile nicht von Hand aendern."
