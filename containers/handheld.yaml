@@ -16,7 +16,7 @@ admin_info:
 
     WICHTIG — Web Serial: Der Editor spricht das Board per USB ueber die
     Web-Serial-API an. Die braucht einen Secure Context, funktioniert also
-    NUR ueber die oeffentliche HTTPS-Tunnel-URL, nicht ueber
+    NUR ueber die oeffentliche HTTPS-Adresse, nicht ueber
     http://<server>:8350. Der lokale Port ist nur fuer Diagnose gedacht.
     Client-Anforderungen: Chrome/Edge (kein Firefox/Safari) und Zugriff auf
     den USB-Port des Schul-PCs.
@@ -28,7 +28,7 @@ image:
 ports:
   - host: 8350          # stackweit eindeutig (open-webui 8310, llmd 8320, pylearn 8330, sponsorenlauf 8340)
     container: 8000
-    description: Web-UI (Editor + Projekte); Web Serial nur ueber die Tunnel-URL
+    description: Web-UI (Editor + Projekte); Web Serial nur ueber die oeffentliche HTTPS-Adresse
 
 # Kein Volume: Projekte, Dateien und Snapshots liegen komplett in Postgres.
 # Der Editor-Build ist Teil des Images. Updates sind damit zustandslos.
@@ -59,8 +59,9 @@ environment:
     value: "handheld"
   - key: OIDC_CLIENT_SECRET
     value: "${HANDHELD_OIDC_SECRET}"
+  # Von stackctl gesetzt — identisch mit der Registrierung in Dex.
   - key: OIDC_REDIRECT_URI
-    value: "https://handheld.${SCHOOL_SLUG}.learningstack.online/auth/callback"
+    value: "${HANDHELD_OIDC_REDIRECT_URI}"
   # Rollen-Defaults nach moin.schule-/zentraler-Dex-Konvention;
   # Operator kann pro Schule via stackctl set ueberschreiben.
   - key: OAUTH_TEACHER_ROLES
@@ -73,7 +74,8 @@ environment:
   # --- Session / Sicherheit ---
   - key: SESSION_SECRET
     value: "${HANDHELD_SESSION_SECRET}"
-  # Session-Cookie nur ueber HTTPS (Tunnel terminiert TLS).
+  # Session-Cookie nur ueber HTTPS (TLS terminiert der Relay bzw. der lokale
+  # Reverse-Proxy — je nach Betriebsart).
   - key: HANDHELD_SECURE_COOKIES
     value: "true"
   # HANDHELD_DEV_LOGIN wird absichtlich NICHT gesetzt — der Dev-Login-Bypass
@@ -100,7 +102,7 @@ global_env:
 
 post_install:
   messages:
-    - "Handheld oeffentlich: https://handheld.{SCHOOL_SLUG}.learningstack.online (Tunnel muss aktiv sein — sowohl fuer den OIDC-Login als auch fuer Web Serial)"
+    - "Handheld oeffentlich: {public_app_url} (oeffentlicher Zugang muss aktiv sein — sowohl fuer den OIDC-Login als auch fuer Web Serial)"
     - "Lokal nur zur Diagnose: http://{server_domain}:8350 — ueber diese Adresse laesst sich KEIN Board verbinden (Web Serial braucht HTTPS)"
     - "Erste Schritte: Als Lehrkraft anmelden (Uebersicht unter /lehrer), Schueler:innen legen unter /projekte ihr erstes Projekt an und oeffnen es im Editor."
     - "Am Schul-PC: Chrome oder Edge, Board per USB anstecken, im Editor auf Verbinden — CircuitPython muss auf dem Board laufen."

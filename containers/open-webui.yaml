@@ -75,6 +75,13 @@ environment:
     value: ""
   # Lokaler Admin-Account beim ersten Start anlegen (verhindert, dass der
   # erste OIDC-Login automatisch Admin wird). Login via /auth-Formular.
+  #
+  # ACHTUNG: Das ist eine E-Mail-Adresse, keine URL — sie ist der
+  # Benutzername in der open-webui-Datenbank und wird nie zugestellt. Sie
+  # bleibt deshalb slug-basiert und wird NICHT auf die oeffentliche Domain
+  # umgeschrieben: der Wert steckt nach dem ersten Start in der DB, und ein
+  # Wechsel wuerde nur einen zweiten Admin-Login erzeugen, der nicht
+  # existiert.
   - key: WEBUI_ADMIN_EMAIL
     value: "admin@${SCHOOL_SLUG}.learningstack.online"
   - key: WEBUI_ADMIN_PASSWORD
@@ -127,7 +134,7 @@ post_install:
     - "Open WebUI: http://{server_domain}:8310"
     - "Lokaler Admin: admin@{school_slug}.learningstack.online + stackctl-Admin-Passwort"
     - "Lehrkraefte/Schueler melden sich ueber Schullogin (OIDC via Dex) an — alle als User"
-    - "OIDC funktioniert nur mit aktivem Tunnel"
+    - "OIDC funktioniert nur mit aktivem oeffentlichem Zugang"
     - "LLM-Backend: lokales llmd-Gateway. Welche Modelle sichtbar sind regelt das"
     - "Open-WebUI-Admin-Panel: Admin -> Models -> Sharing pro Benutzer-Gruppe."
   secrets_to_show:
