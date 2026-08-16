@@ -46,8 +46,11 @@ environment:
     value: "pylearn"
   - key: OIDC_CLIENT_SECRET
     value: "${PYLEARN_OIDC_SECRET}"
+  # Die Redirect-URI kommt von stackctl: dieselbe Zeichenkette wird in Dex
+  # registriert, und sie haengt an der Betriebsart der Schule. Hier selbst
+  # gebaut waere sie fuer jede Schule mit eigener Domain falsch.
   - key: OIDC_REDIRECT_URI
-    value: "https://pylearn.${SCHOOL_SLUG}.learningstack.online/auth/callback"
+    value: "${PYLEARN_OIDC_REDIRECT_URI}"
   # Rollen-Defaults entsprechen den moin.schule-/zentraler-Dex-Konventionen
   # (siehe tools/central-dex/ + memory project_central_dex_moinschule.md).
   # Operator kann pro Schule via stackctl set ueberschreiben.
@@ -55,7 +58,8 @@ environment:
     value: "Lehr,Leit"
   - key: OAUTH_STUDENT_ROLES
     value: "Lern"
-  # Session-Cookie nur ueber HTTPS (Tunnel terminiert TLS).
+  # Session-Cookie nur ueber HTTPS (TLS terminiert der Relay bzw. der lokale
+  # Reverse-Proxy — je nach Betriebsart).
   - key: PYLEARN_SECURE_COOKIES
     value: "true"
   # KI-Anfragen pro Schueler:in (0 = aus). Schuetzt vor Token-Kosten.
@@ -99,7 +103,7 @@ global_env:
 post_install:
   messages:
     - "PyLearn: http://{server_domain}:8330"
-    - "Oeffentlich: https://pylearn.{SCHOOL_SLUG}.learningstack.online (Tunnel muss aktiviert sein fuer OIDC-Login)"
+    - "Oeffentlich: {public_app_url} (oeffentlicher Zugang muss aktiv sein, sonst kein OIDC-Login)"
     - "Erste Schritte: Als Lehrkraft anmelden, unter /admin/llm-config eine Persona auswaehlen, dann Lerngruppen anlegen"
   secrets_to_show:
     - key: PYLEARN_OIDC_SECRET
