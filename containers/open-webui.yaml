@@ -57,8 +57,8 @@ environment:
   - key: OAUTH_SCOPES
     value: "openid profile email groups"
   # Anzeige-Name = Vorname (moin.schule liefert aktuell keinen Vollnamen).
-  # "email" ist der stabile App-Identifier — vom zentralen Dex gemapped
-  # auf moin.schules opaken sub (nicht echte E-Mail, aber stabil+eindeutig).
+  # "email" ist der stabile App-Identifier — laut Claim-Kontrakt immer gesetzt,
+  # bei moin.schule deren opaker sub (nicht echte E-Mail, aber stabil+eindeutig).
   - key: OAUTH_USERNAME_CLAIM
     value: name
   - key: OAUTH_EMAIL_CLAIM

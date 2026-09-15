@@ -9,10 +9,8 @@ links:
 
 admin_info:
   notes: |
-    Wird nur bei der Betriebsart "direkt" gebraucht: der Server haelt Port 80
-    und 443 selbst, terminiert TLS und leitet anhand des Hostnamens an die
-    passende App weiter. Bei Betrieb ueber einen Relay-Tunnel ist dieser
-    Dienst ueberfluessig.
+    Der Server haelt Port 80 und 443 selbst, terminiert TLS und leitet
+    anhand des Hostnamens an die passende App weiter.
 
     Die Zertifikate holt und erneuert Caddy selbst ueber Let's Encrypt
     (HTTP-01). Voraussetzung: *.{public_base_domain} zeigt im DNS auf diesen

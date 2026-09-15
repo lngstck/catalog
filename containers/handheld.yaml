@@ -74,8 +74,7 @@ environment:
   # --- Session / Sicherheit ---
   - key: SESSION_SECRET
     value: "${HANDHELD_SESSION_SECRET}"
-  # Session-Cookie nur ueber HTTPS (TLS terminiert der Relay bzw. der lokale
-  # Reverse-Proxy — je nach Betriebsart).
+  # Session-Cookie nur ueber HTTPS (TLS terminiert der lokale Reverse-Proxy).
   - key: HANDHELD_SECURE_COOKIES
     value: "true"
   # HANDHELD_DEV_LOGIN wird absichtlich NICHT gesetzt — der Dev-Login-Bypass
