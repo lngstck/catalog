@@ -1,0 +1,64 @@
+name: caddy-image
+
+# Baut ghcr.io/lngstck/caddy: das offizielle Caddy plus deSEC-Modul fuer
+# DNS-01. Der Tag kommt aus den Versionen im Dockerfile, damit ein Image nie
+# stillschweigend ueberschrieben wird.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'images/caddy/**'
+      - '.github/workflows/caddy-image.yml'
+  pull_request:
+    paths:
+      - 'images/caddy/**'
+      - '.github/workflows/caddy-image.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write    # noetig fuer ghcr.io push
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Tag aus dem Dockerfile ableiten
+        id: version
+        run: |
+          caddy=$(sed -n 's/^ARG CADDY_VERSION=//p' images/caddy/Dockerfile)
+          desec=$(sed -n 's/^ARG DESEC_VERSION=v//p' images/caddy/Dockerfile)
+          test -n "$caddy" && test -n "$desec"
+          echo "tag=${caddy}-desec${desec}" >> "$GITHUB_OUTPUT"
+
+      - uses: docker/setup-buildx-action@v3
+
+      # Login nur wenn wir auch wirklich pushen (PRs nicht).
+      - name: Log in to GHCR
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: images/caddy
+          platforms: linux/amd64,linux/arm64
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ghcr.io/lngstck/caddy:${{ steps.version.outputs.tag }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      # Das Image muss das Modul tatsaechlich enthalten — ein Build ohne
+      # --with wuerde sonst unbemerkt ein Caddy ohne DNS-01 ausliefern.
+      - name: Modul pruefen
+        if: github.event_name != 'pull_request'
+        run: |
+          docker run --rm ghcr.io/lngstck/caddy:${{ steps.version.outputs.tag }} \
+            caddy list-modules | grep -x 'dns.providers.desec'
