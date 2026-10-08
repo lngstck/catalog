@@ -51,15 +51,13 @@ environment:
   # gebaut waere sie fuer jede Schule mit eigener Domain falsch.
   - key: OIDC_REDIRECT_URI
     value: "${PYLEARN_OIDC_REDIRECT_URI}"
-  # Rollen-Defaults entsprechen den moin.schule-/zentraler-Dex-Konventionen
-  # (siehe tools/central-dex/ + memory project_central_dex_moinschule.md).
+  # Rollen-Defaults entsprechen den moin.schule-Konventionen (Lehr/Lern/Leit).
   # Operator kann pro Schule via stackctl set ueberschreiben.
   - key: OAUTH_TEACHER_ROLES
     value: "Lehr,Leit"
   - key: OAUTH_STUDENT_ROLES
     value: "Lern"
-  # Session-Cookie nur ueber HTTPS (TLS terminiert der Relay bzw. der lokale
-  # Reverse-Proxy — je nach Betriebsart).
+  # Session-Cookie nur ueber HTTPS (TLS terminiert der lokale Reverse-Proxy).
   - key: PYLEARN_SECURE_COOKIES
     value: "true"
   # KI-Anfragen pro Schueler:in (0 = aus). Schuetzt vor Token-Kosten.
