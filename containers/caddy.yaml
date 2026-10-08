@@ -1,7 +1,7 @@
 id: caddy
 name: Reverse-Proxy (Caddy)
-version: "1.0"
-description: TLS-Terminierung und Hostname-Routing fuer Installationen, die direkt am Internet haengen
+version: "1.1"
+description: TLS-Terminierung und Hostname-Routing fuer Login und Apps
 category: infrastructure
 
 links:
@@ -9,24 +9,32 @@ links:
 
 admin_info:
   notes: |
-    Der Server haelt Port 80 und 443 selbst, terminiert TLS und leitet
-    anhand des Hostnamens an die passende App weiter.
+    Caddy haelt Port 80 und 443, terminiert TLS und leitet anhand des
+    Hostnamens an die passende App weiter: {public_app_url} und alle
+    anderen Adressen unter {public_base_domain}.
 
-    Die Zertifikate holt und erneuert Caddy selbst ueber Let's Encrypt
-    (HTTP-01). Voraussetzung: *.{public_base_domain} zeigt im DNS auf diesen
-    Server, und Port 80 ist aus dem Internet erreichbar — ohne Port 80
-    scheitert die Erneuerung still, bis das Zertifikat ablaeuft.
+    Zertifikate:
+    - Nur im Schulnetz: ein Wildcard-Zertifikat fuer *.{public_base_domain}
+      ueber DNS-01 bei deSEC. Die Zertifizierungsstelle erreicht den Server
+      dabei nie; Voraussetzung ist der CNAME fuer
+      _acme-challenge.{public_base_domain}.
+    - Direkter Betrieb: je Adresse ein Zertifikat ueber HTTP-01. Port 80
+      muss dauerhaft aus dem Internet erreichbar sein, sonst scheitert die
+      Erneuerung still, bis das Zertifikat ablaeuft.
 
     Die Konfiguration (/etc/caddy/Caddyfile) erzeugt stackctl vollstaendig
     selbst und laedt sie bei jeder Aenderung neu. Nicht von Hand editieren —
     die Datei wird ueberschrieben.
 
+# Offizielles Caddy plus deSEC-Modul fuer DNS-01, gebaut aus
+# images/caddy/Dockerfile in diesem Repo.
 image:
-  name: caddy
-  tag: "2-alpine"
+  name: ghcr.io/lngstck/caddy
+  tag: "2.11.7-desec1.1.0"
 
-# Dieser Container IST der oeffentliche Zugang. Seine Ports bleiben deshalb
-# auf 0.0.0.0, auch wenn stackctl alle uebrigen Apps auf 127.0.0.1 bindet.
+# Dieser Container IST der Zugang zu Login und Apps. Seine Ports bleiben
+# deshalb auf 0.0.0.0, auch wenn stackctl alle uebrigen Apps auf 127.0.0.1
+# bindet.
 public_entrypoint: true
 
 ports:
@@ -36,6 +44,13 @@ ports:
   - host: 443
     container: 443
     description: HTTPS
+
+# API-Token fuer deSEC (nur Betrieb im Schulnetz). stackctl schreibt ihn in die
+# .env; im Caddyfile steht nur der Verweis {env.DESEC_TOKEN}, denn die Datei
+# ist fuer alle lesbar.
+environment:
+  - key: DESEC_TOKEN
+    value: "${DESEC_TOKEN}"
 
 volumes:
   # Zertifikate und der ACME-Account. Gehoert unbedingt ins Backup: ohne
@@ -61,5 +76,5 @@ command:
 post_install:
   messages:
     - "Caddy laeuft. Die Zertifikate holt er beim ersten Aufruf einer Adresse automatisch."
-    - "Voraussetzung: *.{public_base_domain} zeigt im DNS auf diesen Server und Port 80/443 sind aus dem Internet erreichbar."
+    - "Voraussetzung: *.{public_base_domain} zeigt im DNS auf diesen Server."
     - "Die Konfiguration erzeugt stackctl selbst — /etc/caddy/Caddyfile nicht von Hand aendern."
