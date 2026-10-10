@@ -1,6 +1,6 @@
 id: open-webui
 name: Open WebUI
-version: "1.6"
+version: "1.7"
 breaking: true
 description: Chat-Oberflaeche fuer LLMs
 category: education
@@ -63,14 +63,16 @@ environment:
     value: name
   - key: OAUTH_EMAIL_CLAIM
     value: email
-  # Rollen-Mapping: Lehr/Leit/Lern duerfen rein, aber KEIN OIDC-User wird Admin.
-  # Admin ist ausschliesslich der via WEBUI_ADMIN_* geseedete Account.
+  # Rollen-Mapping: Lehrkraefte und Schueler:innen duerfen rein, aber KEIN
+  # OIDC-User wird Admin. Admin ist ausschliesslich der via WEBUI_ADMIN_*
+  # geseedete Account. Welche groups-Werte die Rollen tragen, schreibt
+  # stackctl in die .env (Claim-Kontrakt) — kein Anbieterwert steht hier.
   - key: ENABLE_OAUTH_ROLE_MANAGEMENT
     value: "true"
   - key: OAUTH_ROLES_CLAIM
     value: groups
   - key: OAUTH_ALLOWED_ROLES
-    value: "Lehr,Leit,Lern"
+    value: "${ROLE_TEACHER_GROUPS},${ROLE_STUDENT_GROUPS}"
   - key: OAUTH_ADMIN_ROLES
     value: ""
   # Lokaler Admin-Account beim ersten Start anlegen (verhindert, dass der
