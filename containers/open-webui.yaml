@@ -133,12 +133,10 @@ global_env:
 
 post_install:
   messages:
-    - "Open WebUI: http://{server_domain}:8310"
-    - "Lokaler Admin: admin@{school_slug}.learningstack.online + stackctl-Admin-Passwort"
-    - "Lehrkraefte/Schueler melden sich ueber Schullogin (OIDC via Dex) an — alle als User"
-    - "OIDC funktioniert nur mit aktivem oeffentlichem Zugang"
-    - "LLM-Backend: lokales llmd-Gateway. Welche Modelle sichtbar sind regelt das"
-    - "Open-WebUI-Admin-Panel: Admin -> Models -> Sharing pro Benutzer-Gruppe."
+    - "Open WebUI: {public_app_url}"
+    - "Lokaler Admin: admin@{school_slug}.learningstack.online mit dem stackctl-Admin-Passwort von jetzt. Ändert es sich später in stackctl, bleibt es in Open WebUI das alte."
+    - "Lehrkräfte und Schüler:innen melden sich über „Schullogin“ an, alle als normale Benutzer."
+    - "Modelle sehen sie erst, wenn der Admin sie in Open WebUI freigibt: Admin-Panel → Models → Sharing."
   secrets_to_show:
     - key: OPEN_WEBUI_OIDC_SECRET
       label: OIDC-Secret

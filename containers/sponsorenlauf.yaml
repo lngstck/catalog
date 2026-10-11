@@ -121,8 +121,7 @@ global_env:
 
 post_install:
   messages:
-    - "Sponsorenlauf lokal: http://{server_domain}:8340"
-    - "Oeffentlich: {public_app_url} (oeffentlicher Zugang muss aktiv sein)"
+    - "Sponsorenlauf: {public_app_url}"
     - "Verwaltung: lokales Admin-Tool — Anleitung unter {public_app_url}/admin — Admin-Token unten notieren!"
     - "Scanstationen (Raspberry Pi): Anleitung + Dienst unter {public_app_url}/station — Ingest-Token unten notieren!"
   secrets_to_show:

@@ -101,7 +101,6 @@ global_env:
 
 post_install:
   messages:
-    - "Handheld oeffentlich: {public_app_url} (oeffentlicher Zugang muss aktiv sein — sowohl fuer den OIDC-Login als auch fuer Web Serial)"
-    - "Lokal nur zur Diagnose: http://{server_domain}:8350 — ueber diese Adresse laesst sich KEIN Board verbinden (Web Serial braucht HTTPS)"
+    - "Handheld: {public_app_url} (Web Serial braucht HTTPS, also genau diese Adresse)"
     - "Erste Schritte: Als Lehrkraft anmelden (Uebersicht unter /lehrer), Schueler:innen legen unter /projekte ihr erstes Projekt an und oeffnen es im Editor."
     - "Am Schul-PC: Chrome oder Edge, Board per USB anstecken, im Editor auf Verbinden — CircuitPython muss auf dem Board laufen."
