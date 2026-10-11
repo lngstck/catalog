@@ -1,6 +1,6 @@
 id: open-webui
 name: Open WebUI
-version: "1.7"
+version: "1.8"
 breaking: true
 description: Chat-Oberflaeche fuer LLMs
 category: education
@@ -22,7 +22,7 @@ admin_info:
 
 image:
   name: ghcr.io/open-webui/open-webui
-  tag: "0.9.5"
+  tag: "0.12.0"
 
 ports:
   - host: 8310
