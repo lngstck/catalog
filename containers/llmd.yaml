@@ -46,7 +46,6 @@ post_install:
     - "     (Key per stdin paste, damit er nicht in der Shell-History landet)"
     - "  2. stackctl llm persona set grundschul-erklaerer --provider openai --upstream-id gpt-4o-mini"
     - "  3. stackctl llm persona set sek2-helfer --provider openai --upstream-id gpt-4o"
-    - "  4. In Open WebUI: Admin -> Models -> Personas fuer Benutzer-Gruppen freigeben"
     - ""
     - "Beispiel-Personas (grundschul-erklaerer, sek2-helfer) sind bereits angelegt"
     - "und tragen ihren System-Prompt inline. Eigene Personas: 'stackctl llm persona add'."
