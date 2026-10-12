@@ -1,7 +1,7 @@
 id: dex
-name: Dex (OIDC)
+name: Anmeldung (Dex)
 version: "1.3"
-description: Anmeldung mit dem Schulkonto (OIDC)
+description: Anmeldung mit dem Schulkonto für alle Apps
 category: infrastructure
 
 links:
@@ -16,9 +16,9 @@ image:
 # generierten config.yaml gesetzt). Kein Postgres-Dependency.
 #
 # Entrypoint-Override: Der Default-Entrypoint des dex-Images ist ein
-# Wrapper, der gomplate auf alle .yaml-Configs loslaesst. In v2.45.1 ist
-# gomplate fuer den non-root dex-User (uid 1001) nicht ausfuehrbar, daher
-# schlaegt der Start fehl ("fork/exec /usr/local/bin/gomplate: permission
+# Wrapper, der gomplate auf alle .yaml-Configs loslässt. In v2.45.1 ist
+# gomplate für den non-root dex-User (uid 1001) nicht ausführbar, daher
+# schlägt der Start fehl ("fork/exec /usr/local/bin/gomplate: permission
 # denied"). stackctl schreibt die Config bereits voll expandiert, wir
 # brauchen gomplate nicht — also direkt dex starten.
 entrypoint:
@@ -30,12 +30,11 @@ command:
 ports:
   - host: 5556
     container: 5556
-    description: OIDC-Endpunkt
-    bind: "0.0.0.0"
+    description: OIDC-Endpunkt (erreichbar über die Adresse auth.<domain>)
 
 volumes:
-  # Dex laeuft im Image als non-root User 1001:1001 — /data muss uid 1001
-  # gehoeren, damit Dex dort die SQLite-DB schreiben kann.
+  # Dex läuft im Image als non-root User 1001:1001 — /data muss uid 1001
+  # gehören, damit Dex dort die SQLite-DB schreiben kann.
   - host: /opt/learningstack/dex/data
     container: /data
     owner: "1001:1001"
@@ -50,12 +49,11 @@ volumes:
 # dex-config.yaml wird von stackctl komplett verwaltet: stackctl schreibt
 # sie nach /opt/learningstack/dex/config/config.yaml bei Setup sowie bei
 # jeder App-Installation/Entfernung (via dex.SaveConfig + docker restart).
-# Darum KEIN configs:-Block — der wuerde stackctls Datei ueberschreiben.
+# Darum KEIN configs:-Block — der würde stackctls Datei überschreiben.
 
 depends_on: []
 
 post_install:
   messages:
-    - "Dex OIDC-Provider laeuft auf Port 5556"
-    - "Konfiguration wird von stackctl automatisch verwaltet"
-    - "OIDC-URL: ${DEX_AUTH_URL}"
+    - "Die Anmeldung läuft unter ${DEX_AUTH_URL}."
+    - "Die Konfiguration verwaltet stackctl. Testkonten unter Einstellungen → Anmeldung."

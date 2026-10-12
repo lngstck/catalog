@@ -1,7 +1,7 @@
 id: pylearn
 name: PyLearn
-version: "0.8.0"
-description: KI-gestuetzte Python-Lernumgebung mit Pyodide, ACE-Editor und Lehrer-Dashboard
+version: "0.8.0-1"
+description: KI-gestützte Python-Lernumgebung mit Pyodide, ACE-Editor und Lehrer-Dashboard
 category: education
 
 links:
@@ -47,20 +47,21 @@ environment:
   - key: OIDC_CLIENT_SECRET
     value: "${PYLEARN_OIDC_SECRET}"
   # Die Redirect-URI kommt von stackctl: dieselbe Zeichenkette wird in Dex
-  # registriert, und sie haengt an der Betriebsart der Schule. Hier selbst
-  # gebaut waere sie fuer jede Schule mit eigener Domain falsch.
+  # registriert, und sie hängt an der Betriebsart der Schule. Hier selbst
+  # gebaut wäre sie für jede Schule mit eigener Domain falsch.
   - key: OIDC_REDIRECT_URI
     value: "${PYLEARN_OIDC_REDIRECT_URI}"
-  # Rollen-Defaults entsprechen den moin.schule-Konventionen (Lehr/Lern/Leit).
-  # Operator kann pro Schule via stackctl set ueberschreiben.
+  # Welche groups-Werte Lehrkraft und Schüler:in bedeuten, schreibt stackctl
+  # in die .env (Claim-Kontrakt): bei den Testkonten lehrkraft/schueler,
+  # später die Werte des Anmeldedienstes der Schule.
   - key: OAUTH_TEACHER_ROLES
-    value: "Lehr,Leit"
+    value: "${ROLE_TEACHER_GROUPS}"
   - key: OAUTH_STUDENT_ROLES
-    value: "Lern"
-  # Session-Cookie nur ueber HTTPS (TLS terminiert der lokale Reverse-Proxy).
+    value: "${ROLE_STUDENT_GROUPS}"
+  # Session-Cookie nur über HTTPS (TLS terminiert der lokale Reverse-Proxy).
   - key: PYLEARN_SECURE_COOKIES
     value: "true"
-  # KI-Anfragen pro Schueler:in (0 = aus). Schuetzt vor Token-Kosten.
+  # KI-Anfragen pro Schüler:in (0 = aus). Schützt vor Token-Kosten.
   - key: PYLEARN_AI_RATE_LIMIT_HOUR
     value: "60"
   - key: PYLEARN_AI_RATE_LIMIT_DAY
@@ -86,24 +87,19 @@ environment:
 
 global_env:
   - key: SCHOOL_NAME
-    description: Schulname (fuer Anzeige in der App)
+    description: Schulname (für Anzeige in der App)
     required: false
   - key: SCHOOL_SLUG
-    description: URL-sicherer Schulkuerzel
+    description: URL-sicherer Schulkürzel
     required: false
   - key: DEX_AUTH_URL
     description: Dex-OIDC-Base-URL
     required: false
   - key: LLM_API_KEY
-    description: API-Key fuer den lokalen llmd-Gateway
+    description: API-Key für den lokalen llmd-Gateway
     required: true
 
 post_install:
   messages:
     - "PyLearn: {public_app_url}"
-    - "Erste Schritte: als Lehrkraft anmelden, unter {public_app_url}/admin/llm-config eine Persona wählen, dann Lerngruppen anlegen."
-  secrets_to_show:
-    - key: PYLEARN_OIDC_SECRET
-      label: OIDC-Secret
-    - key: PYLEARN_SESSION_SECRET
-      label: Session-Secret
+    - "Erste Schritte: als Lehrkraft anmelden, unter {public_app_url}/admin/llm-config ein Modell (Persona) wählen, dann Lerngruppen anlegen."

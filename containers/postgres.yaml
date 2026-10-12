@@ -1,7 +1,7 @@
 id: postgres
-name: PostgreSQL
+name: Datenbank (PostgreSQL)
 version: "1.3"
-description: Zentrale Datenbank fuer alle Apps
+description: Speichert die Daten aller Apps
 category: infrastructure
 
 links:
@@ -31,8 +31,8 @@ volumes:
     container: /var/lib/postgresql
     owner: "999:999"
 
-# Bootstrap-Superuser heisst "postgres" — passend zu psql -U postgres, das
-# stackctl fuer SetupAppDB benutzt. Jede App bekommt einen eigenen User/DB
+# Bootstrap-Superuser heißt "postgres" — passend zu psql -U postgres, das
+# stackctl für SetupAppDB benutzt. Jede App bekommt einen eigenen User/DB
 # (= sanitized App-ID) mit eigenem Passwort in {APP_ID}_DB_PASSWORD.
 environment:
   - key: POSTGRES_USER
@@ -50,9 +50,5 @@ depends_on: []
 
 post_install:
   messages:
-    - "PostgreSQL laeuft auf localhost:8100 (nur lokal)"
-    - "Bootstrap-Benutzer: postgres"
-    - "Andere Apps erhalten eigene DB-User/Datenbanken beim Install"
-  secrets_to_show:
-    - key: POSTGRES_PASSWORD
-      label: PostgreSQL-Bootstrap-Passwort
+    - "Die Datenbank läuft, nur auf dem Server selbst erreichbar (localhost:8100)."
+    - "Jede App bekommt bei ihrer Installation eine eigene Datenbank mit eigenem Benutzer."

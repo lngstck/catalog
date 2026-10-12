@@ -1,7 +1,7 @@
 id: llmd
-name: LLM-Gateway
+name: KI-Dienst (llmd)
 version: "0.2.0"
-description: LLM-Proxy mit Persona-Layer (OpenAI-kompatibel)
+description: Verbindet Apps mit KI-Anbietern, mit Modellen und Prompts der Schule
 category: infrastructure
 
 links:
@@ -15,15 +15,14 @@ ports:
   - host: 8320
     container: 8000
     description: API (OpenAI-kompatibel)
-    bind: "0.0.0.0"
 
 volumes:
   # llmd liest config.yaml aus /etc/llmd. stackctl schreibt sie direkt in
-  # das Host-Verzeichnis und schickt SIGHUP fuer Reload. Schema v2 inlined
+  # das Host-Verzeichnis und schickt SIGHUP für Reload. Schema v2 inlined
   # Provider-Keys und Persona-Prompts in dieser einen Datei.
-  # Read-only Mount, daher KEIN owner: — stackctl-User muss schreiben koennen,
+  # Read-only Mount, daher KEIN owner: — stackctl-User muss schreiben können,
   # 0o755/0o644 (von paths.EnsureDir/AtomicWrite gesetzt) reicht dem 1001-User
-  # zum Lesen. Siehe ARCHITECTURE.md §16.2.
+  # zum Lesen.
   - host: /opt/learningstack/llmd/config
     container: /etc/llmd
     readonly: true
@@ -31,7 +30,7 @@ volumes:
 depends_on: []
 
 # Bewusst KEIN oidc:-Block — llmd kennt keine User. Zugriffskontrolle
-# laeuft per API-Key (bcrypt-gehasht in config.yaml). Die anrufende App
+# läuft per API-Key (bcrypt-gehasht in config.yaml). Die anrufende App
 # (Open WebUI etc.) macht ggf. eigene Per-Group-Permissions.
 #
 # Bewusst KEIN environment:-Block — die gesamte Konfiguration inkl.
@@ -40,13 +39,6 @@ depends_on: []
 
 post_install:
   messages:
-    - "LLM-Gateway laeuft auf Port 8320."
-    - "Naechste Schritte zur Inbetriebnahme:"
-    - "  1. stackctl llm provider add --id openai --base-url https://api.openai.com --api-key-stdin"
-    - "     (Key per stdin paste, damit er nicht in der Shell-History landet)"
-    - "  2. stackctl llm persona set grundschul-erklaerer --provider openai --upstream-id gpt-4o-mini"
-    - "  3. stackctl llm persona set sek2-helfer --provider openai --upstream-id gpt-4o"
-    - ""
-    - "Beispiel-Personas (grundschul-erklaerer, sek2-helfer) sind bereits angelegt"
-    - "und tragen ihren System-Prompt inline. Eigene Personas: 'stackctl llm persona add'."
-    - "Passthrough (ohne System-Prompt): zusaetzlich '--no-prompt' beim Anlegen."
+    - "Der KI-Dienst läuft. Apps aus dem Katalog sprechen ihn direkt an."
+    - "Nächster Schritt in stackctl unter „KI“: einen Anbieter eintragen, etwa OpenAI oder ein Ollama im Schulnetz, und den Modellen zuweisen."
+    - "Zwei Beispiel-Modelle mit eigenem System-Prompt sind schon angelegt: grundschul-erklaerer und sek2-helfer."

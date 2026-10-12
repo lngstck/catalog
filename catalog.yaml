@@ -1,37 +1,37 @@
 version: "1.0"
 apps:
   - id: postgres
-    name: PostgreSQL
+    name: Datenbank (PostgreSQL)
     category: infrastructure
-    description: Zentrale Datenbank fuer alle Apps
+    description: Speichert die Daten aller Apps
   - id: dex
-    name: Dex (OIDC)
+    name: Anmeldung (Dex)
     category: infrastructure
-    description: Anmeldung mit dem Schulkonto (OIDC)
+    description: Anmeldung mit dem Schulkonto für alle Apps
   - id: caddy
-    name: Reverse-Proxy (Caddy)
+    name: Webzugang (Caddy)
     category: infrastructure
-    description: TLS-Terminierung und Hostname-Routing fuer Login und Apps
+    description: Holt die Zertifikate und leitet Login und Apps an ihre Adressen
   - id: llmd
-    name: LLM-Gateway
+    name: KI-Dienst (llmd)
     category: infrastructure
-    description: LLM-Proxy mit Persona-Layer (OpenAI-kompatibel)
+    description: Verbindet Apps mit KI-Anbietern, mit Modellen und Prompts der Schule
   - id: open-webui
     name: Open WebUI
     category: education
-    description: Chat-Oberflaeche fuer LLMs
+    description: KI-Chat für Lehrkräfte und Schüler:innen
   - id: pylearn
     name: PyLearn
     category: education
-    description: KI-gestuetzte Python-Lernumgebung mit Pyodide, ACE-Editor und Lehrer-Dashboard
+    description: KI-gestützte Python-Lernumgebung mit Pyodide, ACE-Editor und Lehrer-Dashboard
   - id: sponsorenlauf
     name: Sponsorenlauf
     category: education
-    description: Sponsorenlauf-Verwaltung mit RFID-Rundenzaehlung und Sponsor-Selbsteintragung
+    description: Sponsorenlauf-Verwaltung mit RFID-Rundenzählung und Sponsor-Selbsteintragung
   - id: handheld
     name: Handheld
     category: education
-    description: CircuitPython-Editor fuer die schulische ESP32-Handheld-Konsole, mit Projektablage und Lehrer-Leseansicht
+    description: CircuitPython-Editor für die schulische ESP32-Handheld-Konsole, mit Projektablage und Lehrer-Leseansicht
   - id: roberta
     name: Open Roberta Lab
     category: education
@@ -39,5 +39,5 @@ apps:
 
 global_env_schema:
   - key: LLM_API_KEY
-    description: API-Key fuer den lokalen llmd-Gateway (automatisch beim llmd-Install gesetzt)
+    description: Schlüssel für den KI-Dienst (setzt stackctl bei dessen Installation)
     required: false
