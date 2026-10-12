@@ -3,7 +3,7 @@ apps:
   - id: postgres
     name: PostgreSQL
     category: infrastructure
-    description: Zentrale Datenbank fuer alle Apps
+    description: Zentrale Datenbank für alle Apps
   - id: dex
     name: Dex (OIDC)
     category: infrastructure
@@ -11,7 +11,7 @@ apps:
   - id: caddy
     name: Reverse-Proxy (Caddy)
     category: infrastructure
-    description: TLS-Terminierung und Hostname-Routing fuer Login und Apps
+    description: TLS-Terminierung und Hostname-Routing für Login und Apps
   - id: llmd
     name: LLM-Gateway
     category: infrastructure
@@ -19,19 +19,19 @@ apps:
   - id: open-webui
     name: Open WebUI
     category: education
-    description: Chat-Oberflaeche fuer LLMs
+    description: Chat-Oberfläche für LLMs
   - id: pylearn
     name: PyLearn
     category: education
-    description: KI-gestuetzte Python-Lernumgebung mit Pyodide, ACE-Editor und Lehrer-Dashboard
+    description: KI-gestützte Python-Lernumgebung mit Pyodide, ACE-Editor und Lehrer-Dashboard
   - id: sponsorenlauf
     name: Sponsorenlauf
     category: education
-    description: Sponsorenlauf-Verwaltung mit RFID-Rundenzaehlung und Sponsor-Selbsteintragung
+    description: Sponsorenlauf-Verwaltung mit RFID-Rundenzählung und Sponsor-Selbsteintragung
   - id: handheld
     name: Handheld
     category: education
-    description: CircuitPython-Editor fuer die schulische ESP32-Handheld-Konsole, mit Projektablage und Lehrer-Leseansicht
+    description: CircuitPython-Editor für die schulische ESP32-Handheld-Konsole, mit Projektablage und Lehrer-Leseansicht
   - id: roberta
     name: Open Roberta Lab
     category: education
@@ -39,5 +39,5 @@ apps:
 
 global_env_schema:
   - key: LLM_API_KEY
-    description: API-Key fuer den lokalen llmd-Gateway (automatisch beim llmd-Install gesetzt)
+    description: API-Key für den lokalen llmd-Gateway (automatisch beim llmd-Install gesetzt)
     required: false

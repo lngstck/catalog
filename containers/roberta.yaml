@@ -13,11 +13,11 @@ admin_info:
     Kein Schullogin: Open Roberta kennt kein OIDC und fuehrt eigene Konten.
     Programmieren und auf den Roboter uebertragen geht ohne Anmeldung, die
     Programme lassen sich dann als Datei exportieren. Wer auf dem Server
-    speichern will, legt dort ein Konto an; Lehrkraefte koennen darunter
-    Gruppen mit Schuelerkonten erzeugen. E-Mail ist dafuer nicht noetig.
+    speichern will, legt dort ein Konto an; Lehrkräfte können darunter
+    Gruppen mit Schuelerkonten erzeugen. E-Mail ist dafuer nicht nötig.
 
 # Das offizielle Einzel-Image: Server, Weboberflaeche und alle Crosscompiler
-# in einem Container, rund 1 GB. Gibt es nur fuer amd64.
+# in einem Container, rund 1 GB. Gibt es nur für amd64.
 image:
   name: openroberta/standalone
   tag: "5.2.32"
@@ -27,12 +27,12 @@ ports:
     container: 1999
     description: Web UI
 
-# Die Datenbank (HSQLDB) laeuft eingebettet im Server und liegt als Datei in
+# Die Datenbank (HSQLDB) läuft eingebettet im Server und liegt als Datei in
 # /opt/db. Ist der Ordner beim Start leer, legt das Image eine neue an.
 #
 # /tmp/openrobertaTmp (Build-Ausgaben der Crosscompiler) wird bewusst NICHT
 # nach /opt/learningstack gelegt: alles dort landet in jeder Sicherung. Das
-# Image deklariert den Pfad als Volume, Docker haelt ihn deshalb selbst.
+# Image deklariert den Pfad als Volume, Docker hält ihn deshalb selbst.
 volumes:
   - host: /opt/learningstack/roberta/db
     container: /opt/db

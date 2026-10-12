@@ -2,7 +2,7 @@ id: open-webui
 name: Open WebUI
 version: "1.8"
 breaking: true
-description: Chat-Oberflaeche fuer LLMs
+description: Chat-Oberfläche für LLMs
 category: education
 
 links:
@@ -15,9 +15,9 @@ admin_info:
   notes: |
     Der lokale Admin wird nur beim allerersten Start angelegt, wenn die
     Postgres-Datenbank `open_webui` leer ist. War die App vorher schon
-    installiert, muss beim Entfernen die Option "Daten loeschen" aktiviert
+    installiert, muss beim Entfernen die Option "Daten löschen" aktiviert
     sein, damit der Admin neu geseedet wird.
-    OIDC-Schullogin laeuft parallel — Lehrkraefte/Schueler kommen ueber den
+    OIDC-Schullogin läuft parallel — Lehrkräfte/Schüler kommen über den
     Schullogin-Button rein und bleiben User.
 
 image:
@@ -63,8 +63,8 @@ environment:
     value: name
   - key: OAUTH_EMAIL_CLAIM
     value: email
-  # Rollen-Mapping: Lehrkraefte und Schueler:innen duerfen rein, aber KEIN
-  # OIDC-User wird Admin. Admin ist ausschliesslich der via WEBUI_ADMIN_*
+  # Rollen-Mapping: Lehrkräfte und Schüler:innen dürfen rein, aber KEIN
+  # OIDC-User wird Admin. Admin ist ausschließlich der via WEBUI_ADMIN_*
   # geseedete Account. Welche groups-Werte die Rollen tragen, schreibt
   # stackctl in die .env (Claim-Kontrakt) — kein Anbieterwert steht hier.
   - key: ENABLE_OAUTH_ROLE_MANAGEMENT
@@ -80,9 +80,9 @@ environment:
   #
   # ACHTUNG: Das ist eine E-Mail-Adresse, keine URL — sie ist der
   # Benutzername in der open-webui-Datenbank und wird nie zugestellt. Sie
-  # bleibt deshalb slug-basiert und wird NICHT auf die oeffentliche Domain
+  # bleibt deshalb slug-basiert und wird NICHT auf die öffentliche Domain
   # umgeschrieben: der Wert steckt nach dem ersten Start in der DB, und ein
-  # Wechsel wuerde nur einen zweiten Admin-Login erzeugen, der nicht
+  # Wechsel würde nur einen zweiten Admin-Login erzeugen, der nicht
   # existiert.
   - key: WEBUI_ADMIN_EMAIL
     value: "admin@${SCHOOL_SLUG}.learningstack.online"
@@ -93,7 +93,7 @@ environment:
   # PostgreSQL statt SQLite — eigener User/DB pro App (stackctl legt sie an).
   - key: DATABASE_URL
     value: "postgresql://open_webui:${OPEN_WEBUI_DB_PASSWORD}@ls-postgres:5432/open_webui"
-  # LLM-Anbindung — laeuft lokal ueber das llmd-Gateway, das stackctl bei
+  # LLM-Anbindung — läuft lokal über das llmd-Gateway, das stackctl bei
   # der llmd-Installation als LLM_API_KEY in die globale .env-Section
   # schreibt. Open WebUI sieht die schul-eigenen Personas als "Modelle".
   - key: OPENAI_API_BASE_URL
@@ -102,7 +102,7 @@ environment:
     value: "${LLM_API_KEY}"
   # Alle angemeldeten Benutzer sehen alle Personas. Welche es gibt, legt die
   # Schule in stackctl fest; ohne das Flag waeren die Modelle nach der
-  # Installation fuer niemanden sichtbar, bis der Admin jedes einzeln in
+  # Installation für niemanden sichtbar, bis der Admin jedes einzeln in
   # Open WebUI freigibt. Kostet die Feinsteuerung pro Gruppe.
   - key: BYPASS_MODEL_ACCESS_CONTROL
     value: "true"
@@ -114,7 +114,7 @@ environment:
     value: "${SCHOOL_NAME} KI-Chat"
   - key: DEFAULT_USER_ROLE
     value: user
-  # Signup deaktivieren — neue User kommen ueber OIDC, lokal nur der Admin.
+  # Signup deaktivieren — neue User kommen über OIDC, lokal nur der Admin.
   - key: ENABLE_SIGNUP
     value: "false"
   - key: ENABLE_LOGIN_FORM
@@ -134,7 +134,7 @@ secrets:
 
 global_env:
   - key: LLM_API_KEY
-    description: API-Key fuer den lokalen llmd-Gateway (von stackctl beim llmd-Install generiert)
+    description: API-Key für den lokalen llmd-Gateway (von stackctl beim llmd-Install generiert)
     required: true
 
 post_install:
