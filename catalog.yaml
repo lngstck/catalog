@@ -32,6 +32,10 @@ apps:
     name: Handheld
     category: education
     description: CircuitPython-Editor fuer die schulische ESP32-Handheld-Konsole, mit Projektablage und Lehrer-Leseansicht
+  - id: roberta
+    name: Open Roberta Lab
+    category: education
+    description: Grafisch programmieren mit NEPO-Blöcken für Calliope, micro:bit, LEGO, Arduino und mehr
 
 global_env_schema:
   - key: LLM_API_KEY
