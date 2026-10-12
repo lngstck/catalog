@@ -1,6 +1,6 @@
 id: open-webui
 name: Open WebUI
-version: "1.7"
+version: "1.8"
 breaking: true
 description: Chat-Oberflaeche fuer LLMs
 category: education
@@ -22,7 +22,7 @@ admin_info:
 
 image:
   name: ghcr.io/open-webui/open-webui
-  tag: "0.9.5"
+  tag: "0.12.0"
 
 ports:
   - host: 8310
@@ -100,6 +100,12 @@ environment:
     value: "http://ls-llmd:8000/v1"
   - key: OPENAI_API_KEY
     value: "${LLM_API_KEY}"
+  # Alle angemeldeten Benutzer sehen alle Personas. Welche es gibt, legt die
+  # Schule in stackctl fest; ohne das Flag waeren die Modelle nach der
+  # Installation fuer niemanden sichtbar, bis der Admin jedes einzeln in
+  # Open WebUI freigibt. Kostet die Feinsteuerung pro Gruppe.
+  - key: BYPASS_MODEL_ACCESS_CONTROL
+    value: "true"
   # Session-Secret
   - key: WEBUI_SECRET_KEY
     value: "${OPEN_WEBUI_SECRET_KEY}"
@@ -135,8 +141,7 @@ post_install:
   messages:
     - "Open WebUI: {public_app_url}"
     - "Lokaler Admin: admin@{school_slug}.learningstack.online mit dem stackctl-Admin-Passwort von jetzt. Ändert es sich später in stackctl, bleibt es in Open WebUI das alte."
-    - "Lehrkräfte und Schüler:innen melden sich über „Schullogin“ an, alle als normale Benutzer."
-    - "Modelle sehen sie erst, wenn der Admin sie in Open WebUI freigibt: Admin-Panel → Models → Sharing."
+    - "Lehrkräfte und Schüler:innen melden sich über „Schullogin“ an, alle als normale Benutzer, und sehen alle Personas aus stackctl."
   secrets_to_show:
     - key: OPEN_WEBUI_OIDC_SECRET
       label: OIDC-Secret
