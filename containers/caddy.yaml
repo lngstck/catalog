@@ -1,7 +1,7 @@
 id: caddy
-name: Reverse-Proxy (Caddy)
+name: Webzugang (Caddy)
 version: "1.1"
-description: TLS-Terminierung und Hostname-Routing für Login und Apps
+description: Holt die Zertifikate und leitet Login und Apps an ihre Adressen
 category: infrastructure
 
 links:
@@ -16,8 +16,9 @@ admin_info:
     Zertifikate:
     - Nur im Schulnetz: ein Wildcard-Zertifikat für *.{public_base_domain}
       über DNS-01 bei deSEC. Die Zertifizierungsstelle erreicht den Server
-      dabei nie; Voraussetzung ist der CNAME für
-      _acme-challenge.{public_base_domain}.
+      dabei nie. Voraussetzung: Die Domain ist per NS-Einträgen an deSEC
+      übergeben (als Ausweg: ein CNAME für _acme-challenge). Das erste
+      Zertifikat dauert meist 5 bis 10 Minuten.
     - Direkter Betrieb: je Adresse ein Zertifikat über HTTP-01. Port 80
       muss dauerhaft aus dem Internet erreichbar sein, sonst scheitert die
       Erneuerung still, bis das Zertifikat abläuft.
@@ -75,6 +76,5 @@ command:
 
 post_install:
   messages:
-    - "Caddy läuft. Die Zertifikate holt er beim ersten Aufruf einer Adresse automatisch."
-    - "Voraussetzung: *.{public_base_domain} zeigt im DNS auf diesen Server."
-    - "Die Konfiguration erzeugt stackctl selbst — /etc/caddy/Caddyfile nicht von Hand ändern."
+    - "Der Webzugang läuft und holt die Zertifikate für *.{public_base_domain}. Im Schulnetz dauert das erste meist 5 bis 10 Minuten."
+    - "Die Konfiguration erzeugt stackctl selbst, /etc/caddy/Caddyfile nicht von Hand ändern."

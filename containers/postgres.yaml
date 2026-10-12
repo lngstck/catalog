@@ -1,7 +1,7 @@
 id: postgres
-name: PostgreSQL
+name: Datenbank (PostgreSQL)
 version: "1.3"
-description: Zentrale Datenbank für alle Apps
+description: Speichert die Daten aller Apps
 category: infrastructure
 
 links:
@@ -50,9 +50,5 @@ depends_on: []
 
 post_install:
   messages:
-    - "PostgreSQL läuft auf localhost:8100 (nur lokal)"
-    - "Bootstrap-Benutzer: postgres"
-    - "Andere Apps erhalten eigene DB-User/Datenbanken beim Install"
-  secrets_to_show:
-    - key: POSTGRES_PASSWORD
-      label: PostgreSQL-Bootstrap-Passwort
+    - "Die Datenbank läuft, nur auf dem Server selbst erreichbar (localhost:8100)."
+    - "Jede App bekommt bei ihrer Installation eine eigene Datenbank mit eigenem Benutzer."

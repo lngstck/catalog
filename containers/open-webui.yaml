@@ -11,14 +11,16 @@ links:
 
 admin_info:
   login: "admin@{school_slug}.learningstack.online"
-  password_hint: "stackctl-Admin-Passwort"
+  password_hint: "stackctl-Admin-Passwort zum Zeitpunkt der Installation"
   notes: |
     Der lokale Admin wird nur beim allerersten Start angelegt, wenn die
     Postgres-Datenbank `open_webui` leer ist. War die App vorher schon
     installiert, muss beim Entfernen die Option "Daten löschen" aktiviert
     sein, damit der Admin neu geseedet wird.
-    OIDC-Schullogin läuft parallel — Lehrkräfte/Schüler kommen über den
-    Schullogin-Button rein und bleiben User.
+    Ändert sich das Admin-Passwort später in stackctl, bleibt es in Open
+    WebUI das alte.
+    Lehrkräfte und Schüler:innen melden sich parallel über „Schullogin“ an
+    und sind dort normale Benutzer.
 
 image:
   name: ghcr.io/open-webui/open-webui
@@ -101,7 +103,7 @@ environment:
   - key: OPENAI_API_KEY
     value: "${LLM_API_KEY}"
   # Alle angemeldeten Benutzer sehen alle Personas. Welche es gibt, legt die
-  # Schule in stackctl fest; ohne das Flag waeren die Modelle nach der
+  # Schule in stackctl fest; ohne das Flag wären die Modelle nach der
   # Installation für niemanden sichtbar, bis der Admin jedes einzeln in
   # Open WebUI freigibt. Kostet die Feinsteuerung pro Gruppe.
   - key: BYPASS_MODEL_ACCESS_CONTROL
@@ -141,9 +143,4 @@ post_install:
   messages:
     - "Open WebUI: {public_app_url}"
     - "Lokaler Admin: admin@{school_slug}.learningstack.online mit dem stackctl-Admin-Passwort von jetzt. Ändert es sich später in stackctl, bleibt es in Open WebUI das alte."
-    - "Lehrkräfte und Schüler:innen melden sich über „Schullogin“ an, alle als normale Benutzer, und sehen alle Personas aus stackctl."
-  secrets_to_show:
-    - key: OPEN_WEBUI_OIDC_SECRET
-      label: OIDC-Secret
-    - key: OPEN_WEBUI_SECRET_KEY
-      label: Session-Secret
+    - "Lehrkräfte und Schüler:innen melden sich über „Schullogin“ an, alle als normale Benutzer, und sehen alle Modelle, die in stackctl unter „KI“ eingerichtet sind."

@@ -10,13 +10,13 @@ links:
 
 admin_info:
   notes: |
-    Kein Schullogin: Open Roberta kennt kein OIDC und fuehrt eigene Konten.
-    Programmieren und auf den Roboter uebertragen geht ohne Anmeldung, die
+    Kein Schullogin: Open Roberta kennt kein OIDC und führt eigene Konten.
+    Programmieren und auf den Roboter übertragen geht ohne Anmeldung, die
     Programme lassen sich dann als Datei exportieren. Wer auf dem Server
     speichern will, legt dort ein Konto an; Lehrkräfte können darunter
-    Gruppen mit Schuelerkonten erzeugen. E-Mail ist dafuer nicht nötig.
+    Gruppen mit Schülerkonten erzeugen. E-Mail ist dafür nicht nötig.
 
-# Das offizielle Einzel-Image: Server, Weboberflaeche und alle Crosscompiler
+# Das offizielle Einzel-Image: Server, Weboberfläche und alle Crosscompiler
 # in einem Container, rund 1 GB. Gibt es nur für amd64.
 image:
   name: openroberta/standalone
@@ -39,7 +39,7 @@ volumes:
 
 depends_on: []
 
-# Welche Roboter zur Auswahl stehen, liesse sich per command einschraenken
+# Welche Roboter zur Auswahl stehen, ließe sich per command einschränken
 # (start.sh reicht die Argumente an den Server durch), z. B.
 #   command: ["-d", "robot.whitelist=calliopev3,microbitv2,spike,ev3lejosv1"]
 # Ohne Angabe sind alle Roboter-Plugins aktiv.

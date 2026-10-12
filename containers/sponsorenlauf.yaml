@@ -1,6 +1,6 @@
 id: sponsorenlauf
 name: Sponsorenlauf
-version: "0.5.0"
+version: "0.5.0-1"
 description: Sponsorenlauf-Verwaltung mit RFID-Rundenzählung und Sponsor-Selbsteintragung
 category: education
 
@@ -76,10 +76,13 @@ environment:
   # Von stackctl gesetzt — identisch mit der Registrierung in Dex.
   - key: OIDC_REDIRECT_URI
     value: "${SPONSORENLAUF_OIDC_REDIRECT_URI}"
+  # Welche groups-Werte Lehrkraft und Schüler:in bedeuten, schreibt stackctl
+  # in die .env (Claim-Kontrakt): bei den Testkonten lehrkraft/schueler,
+  # später die Werte des Anmeldedienstes der Schule.
   - key: OAUTH_TEACHER_ROLES
-    value: "Lehr,Leit"
+    value: "${ROLE_TEACHER_GROUPS}"
   - key: OAUTH_STUDENT_ROLES
-    value: "Lern"
+    value: "${ROLE_STUDENT_GROUPS}"
   # --- Datenbank ---
   - key: DATABASE_URL
     value: "postgresql+psycopg://sponsorenlauf:${SPONSORENLAUF_DB_PASSWORD}@ls-postgres:5432/sponsorenlauf"

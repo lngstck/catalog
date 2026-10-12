@@ -1,6 +1,6 @@
 id: handheld
 name: Handheld
-version: "0.1.0"
+version: "0.1.0-1"
 description: CircuitPython-Editor für die schulische ESP32-Handheld-Konsole, mit Projektablage und Lehrer-Leseansicht
 category: education
 
@@ -61,12 +61,13 @@ environment:
   # Von stackctl gesetzt — identisch mit der Registrierung in Dex.
   - key: OIDC_REDIRECT_URI
     value: "${HANDHELD_OIDC_REDIRECT_URI}"
-  # Rollen-Defaults nach moin.schule-/zentraler-Dex-Konvention;
-  # Operator kann pro Schule via stackctl set überschreiben.
+  # Welche groups-Werte Lehrkraft und Schüler:in bedeuten, schreibt stackctl
+  # in die .env (Claim-Kontrakt): bei den Testkonten lehrkraft/schueler,
+  # später die Werte des Anmeldedienstes der Schule.
   - key: OAUTH_TEACHER_ROLES
-    value: "Lehr,Leit"
+    value: "${ROLE_TEACHER_GROUPS}"
   - key: OAUTH_STUDENT_ROLES
-    value: "Lern"
+    value: "${ROLE_STUDENT_GROUPS}"
   # --- Datenbank ---
   - key: DATABASE_URL
     value: "postgresql+psycopg://handheld:${HANDHELD_DB_PASSWORD}@ls-postgres:5432/handheld"
