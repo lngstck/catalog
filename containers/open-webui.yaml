@@ -2,7 +2,7 @@ id: open-webui
 name: Open WebUI
 version: "1.8"
 breaking: true
-description: Chat-Oberfläche für LLMs
+description: KI-Chat für Lehrkräfte und Schüler:innen
 category: education
 
 links:
